@@ -1,5 +1,5 @@
-#include "AnsiRenderer.h"
-#include "Utf8.h"
+#include <ventty/terminal/Renderer.h>
+#include <ventty/core/Utf8.h>
 
 #include <cstdio>
 #include <unistd.h>
@@ -7,10 +7,10 @@
 namespace ventty
 {
 
-void AnsiRenderer::render(Screen const & screen)
+void AnsiRenderer::render(Window const & window)
 {
-    int width = screen.width();
-    int height = screen.height();
+    int width = window.width();
+    int height = window.height();
 
     // Handle resize
     if (width != _prevWidth || height != _prevHeight)
@@ -21,7 +21,7 @@ void AnsiRenderer::render(Screen const & screen)
         _fullRedraw = true;
     }
 
-    Cell const * buffer = screen.data();
+    Cell const * buffer = window.data();
 
     std::string output;
     output.reserve(width * height * 4);
@@ -33,8 +33,6 @@ void AnsiRenderer::render(Screen const & screen)
     output += "\033[?25l";
 
     output += "\033[0m";
-    appendAnsiColor(output, screen.style(), Style{});
-    currentStyle = screen.style();
 
     for (int y = 0; y < height; ++y)
     {
@@ -72,7 +70,7 @@ void AnsiRenderer::render(Screen const & screen)
             }
             else
             {
-                utf8::encode(cell.ch, output);
+                encode(cell.ch, output);
             }
 
             lastX = x + cell.width - 1;

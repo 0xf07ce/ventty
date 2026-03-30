@@ -1,5 +1,5 @@
-#include "AnsiTerminal.h"
-#include "Window.h"
+#include <ventty/terminal/Terminal.h>
+#include <ventty/screen/Window.h>
 
 #include <sys/ioctl.h>
 #include <termios.h>
@@ -320,7 +320,7 @@ void AnsiTerminal::putChar(int x, int y, char32_t cp, Style const & style)
     cell.style = style;
     cell.width = 1;
 
-    if (utf8::isFullwidth(cp) && x + 1 < _cols)
+    if (isFullwidth(cp) && x + 1 < _cols)
     {
         cell.width = 2;
         auto & next = _root[static_cast<size_t>(y * _cols + x + 1)];
@@ -345,7 +345,7 @@ void AnsiTerminal::drawText(int x, int y, std::string_view text, Style const & s
     if (y < 0 || y >= _rows)
         return;
 
-    auto cps = utf8::toCodepoints(text);
+    auto cps = toCodepoints(text);
     int cx = x;
     for (auto cp : cps)
     {
@@ -353,7 +353,7 @@ void AnsiTerminal::drawText(int x, int y, std::string_view text, Style const & s
             break;
         if (cx >= 0)
             putChar(cx, y, cp, style);
-        cx += utf8::displayWidth(cp);
+        cx += displayWidth(cp);
     }
 }
 
@@ -478,7 +478,7 @@ void AnsiTerminal::emitCell(int x, int y, Cell const & cell)
         return;  // continuation cell for fullwidth
 
     std::string buf;
-    utf8::encode(cell.ch, buf);
+    encode(cell.ch, buf);
     ::write(STDOUT_FILENO, buf.data(), buf.size());
 }
 
@@ -692,7 +692,7 @@ bool AnsiTerminal::pollEvent()
     size_t pos = 0;
     while (pos < sv.size())
     {
-        auto cp = utf8::decode(sv, pos);
+        auto cp = decode(sv, pos);
         if (cp == U'\0')
             break;
         KeyEvent ev;
@@ -703,5 +703,9 @@ bool AnsiTerminal::pollEvent()
     }
     return true;
 }
+
+void AnsiTerminal::onKey(KeyCallback cb) { _keyCb = std::move(cb); }
+void AnsiTerminal::onMouse(MouseCallback cb) { _mouseCb = std::move(cb); }
+void AnsiTerminal::onResize(ResizeCallback cb) { _resizeCb = std::move(cb); }
 
 } // namespace ventty

@@ -2,7 +2,7 @@
 // ventty::gfx Terminal — interactive SDL3 demo
 //
 
-#include <ventty_gfx/ventty_gfx.h>
+#include <ventty/ventty_gfx.h>
 
 #include <chrono>
 #include <cstdio>
@@ -118,16 +118,16 @@ int main()
         if (elapsed > 80)
         {
             lastTick = now;
-            spinIdx = (spinIdx + 1) % static_cast<int>(ascii::SPINNER_BRAILLE.size());
+            spinIdx = (spinIdx + 1) % static_cast<int>(SPINNER_BRAILLE.size());
             progress += 0.005f;
             if (progress > 1.0f)
                 progress = 0.0f;
         }
 
-        auto const & frame = ascii::SPINNER_BRAILLE[static_cast<size_t>(spinIdx)];
+        auto const & frame = SPINNER_BRAILLE[static_cast<size_t>(spinIdx)];
         infoWin->drawText(2, 6, std::string(frame) + " Working...", cyan);
 
-        auto bar = ascii::progressBar(36, progress);
+        auto bar = progressBar(36, progress);
         infoWin->drawText(2, 8, bar, green);
 
         std::string status = " ventty::gfx | " +

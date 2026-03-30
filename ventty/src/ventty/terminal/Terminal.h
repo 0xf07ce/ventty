@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Terminal.h"
-#include "Utf8.h"
+#include <ventty/terminal/TerminalBase.hpp>
+#include <ventty/core/Utf8.h>
 
 #include <memory>
 #include <string>
@@ -11,7 +11,7 @@ namespace ventty
 {
 
 /// Real terminal backend — termios raw mode + ANSI escape sequences.
-class AnsiTerminal : public Terminal
+class AnsiTerminal : public TerminalBase
 {
 public:
     AnsiTerminal();
@@ -54,9 +54,9 @@ public:
 
     // -- callbacks --
 
-    void onKey(KeyCallback cb) override { _keyCb = std::move(cb); }
-    void onMouse(MouseCallback cb) override { _mouseCb = std::move(cb); }
-    void onResize(ResizeCallback cb) override { _resizeCb = std::move(cb); }
+    void onKey(KeyCallback cb) override;
+    void onMouse(MouseCallback cb) override;
+    void onResize(ResizeCallback cb) override;
 
     // -- direct cell access --
 

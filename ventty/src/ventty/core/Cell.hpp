@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Color.h"
+#include <ventty/core/Color.h>
 
 namespace ventty
 {

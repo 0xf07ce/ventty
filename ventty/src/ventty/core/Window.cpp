@@ -1,4 +1,4 @@
-#include "Window.h"
+#include <ventty/screen/Window.h>
 
 #include <algorithm>
 
@@ -42,7 +42,7 @@ void Window::putChar(int x, int y, char32_t cp, Style const & style)
     cell.style = style;
     cell.width = 1;
 
-    if (utf8::isFullwidth(cp) && x + 1 < _width)
+    if (isFullwidth(cp) && x + 1 < _width)
     {
         cell.width = 2;
         auto & next = _buffer[static_cast<size_t>(y * _width + x + 1)];
@@ -64,7 +64,7 @@ void Window::drawText(int x, int y, std::string_view text, Style const & style)
     if (y < 0 || y >= _height)
         return;
 
-    auto cps = utf8::toCodepoints(text);
+    auto cps = toCodepoints(text);
     int cx = x;
     for (auto cp : cps)
     {
@@ -72,7 +72,7 @@ void Window::drawText(int x, int y, std::string_view text, Style const & style)
             break;
         if (cx >= 0)
             putChar(cx, y, cp, style);
-        cx += utf8::displayWidth(cp);
+        cx += displayWidth(cp);
     }
 }
 
@@ -106,7 +106,7 @@ void Window::fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg)
 
 void Window::print(std::string_view text, Style const & style)
 {
-    auto cps = utf8::toCodepoints(text);
+    auto cps = toCodepoints(text);
     for (auto cp : cps)
     {
         if (cp == U'\n')
@@ -121,7 +121,7 @@ void Window::print(std::string_view text, Style const & style)
             continue;
         }
 
-        int w = utf8::displayWidth(cp);
+        int w = displayWidth(cp);
         if (_cursorX + w > _width)
         {
             _cursorX = 0;
@@ -236,6 +236,101 @@ void Window::scrollBufferUp()
         _buffer[last + static_cast<size_t>(x)] = Cell{};
 
     _dirty = true;
+}
+
+void Window::drawBox(int x, int y, int w, int h, Style const & style, bool doubleLine)
+{
+    if (w < 2 || h < 2)
+        return;
+
+    char32_t tl, tr, bl, br, hz, vt;
+    if (doubleLine)
+    {
+        tl = U'╔'; tr = U'╗'; bl = U'╚'; br = U'╝';
+        hz = U'═'; vt = U'║';
+    }
+    else
+    {
+        tl = U'┌'; tr = U'┐'; bl = U'└'; br = U'┘';
+        hz = U'─'; vt = U'│';
+    }
+
+    putChar(x, y, tl, style);
+    putChar(x + w - 1, y, tr, style);
+    putChar(x, y + h - 1, bl, style);
+    putChar(x + w - 1, y + h - 1, br, style);
+
+    drawHLine(x + 1, y, w - 2, hz, style);
+    drawHLine(x + 1, y + h - 1, w - 2, hz, style);
+    drawVLine(x, y + 1, h - 2, vt, style);
+    drawVLine(x + w - 1, y + 1, h - 2, vt, style);
+}
+
+void Window::drawHLine(int x, int y, int length, char32_t ch, Style const & style)
+{
+    for (int i = 0; i < length; ++i)
+    {
+        putChar(x + i, y, ch, style);
+    }
+}
+
+void Window::drawVLine(int x, int y, int length, char32_t ch, Style const & style)
+{
+    for (int i = 0; i < length; ++i)
+    {
+        putChar(x, y + i, ch, style);
+    }
+}
+
+void Window::clear(Style const & style)
+{
+    for (auto & c : _buffer)
+    {
+        c = Cell{};
+        c.style = style;
+    }
+    _dirty = true;
+    _cursorX = 0;
+    _cursorY = 0;
+}
+
+Cell const * Window::data() const { return _buffer.data(); }
+int Window::bufferSize() const { return _width * _height; }
+
+int Window::scrollOffset() const { return _scrollOffset; }
+int Window::scrollbackSize() const { return static_cast<int>(_scrollback.size()); }
+int Window::x() const { return _x; }
+int Window::y() const { return _y; }
+int Window::width() const { return _width; }
+int Window::height() const { return _height; }
+
+void Window::setPosition(int x, int y)
+{
+    _x = x;
+    _y = y;
+    _dirty = true;
+}
+
+int Window::zOrder() const { return _zOrder; }
+void Window::setZOrder(int z) { _zOrder = z; }
+bool Window::visible() const { return _visible; }
+
+void Window::setVisible(bool v)
+{
+    _visible = v;
+    _dirty = true;
+}
+
+bool Window::isDirty() const { return _dirty; }
+void Window::markDirty() { _dirty = true; }
+void Window::clearDirty() { _dirty = false; }
+int Window::cursorX() const { return _cursorX; }
+int Window::cursorY() const { return _cursorY; }
+
+void Window::setCursor(int x, int y)
+{
+    _cursorX = x;
+    _cursorY = y;
 }
 
 } // namespace ventty

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Cell.h"
-#include "Color.h"
+#include <ventty/core/Cell.hpp>
+#include <ventty/core/Color.h>
 
 #include <functional>
 #include <string_view>
@@ -57,13 +57,13 @@ using ResizeCallback = std::function<void(ResizeEvent const &)>;
 
 /// Abstract terminal interface — backend-agnostic.
 /// Concrete implementations: AnsiTerminal (ANSI/VT), gfx::GfxTerminal (SDL3).
-class Terminal
+class TerminalBase
 {
 public:
-    virtual ~Terminal() = default;
+    virtual ~TerminalBase() = default;
 
-    Terminal(Terminal const &) = delete;
-    Terminal & operator=(Terminal const &) = delete;
+    TerminalBase(TerminalBase const &) = delete;
+    TerminalBase & operator=(TerminalBase const &) = delete;
 
     // -- lifecycle --
 
@@ -79,13 +79,11 @@ public:
 
     virtual void putChar(int x, int y, char32_t cp) = 0;
     virtual void putChar(int x, int y, char32_t cp, Style const & style) = 0;
-    virtual void putChar(int x, int y, char32_t cp, Color fg, Color bg,
-                         Attr attr = Attr::None) = 0;
+    virtual void putChar(int x, int y, char32_t cp, Color fg, Color bg, Attr attr = Attr::None) = 0;
 
     virtual void drawText(int x, int y, std::string_view text) = 0;
     virtual void drawText(int x, int y, std::string_view text, Style const & style) = 0;
-    virtual void drawText(int x, int y, std::string_view text, Color fg, Color bg,
-                          Attr attr = Attr::None) = 0;
+    virtual void drawText(int x, int y, std::string_view text, Color fg, Color bg, Attr attr = Attr::None) = 0;
 
     virtual void fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg) = 0;
     virtual void fill(int x, int y, int w, int h, char32_t cp, Style const & style) = 0;
@@ -116,7 +114,7 @@ public:
     virtual Cell const & cellAt(int x, int y) const = 0;
 
 protected:
-    Terminal() = default;
+    TerminalBase() = default;
     bool _running = false;
 };
 

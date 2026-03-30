@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Cell.h"
-#include "Screen.h"
+#include <ventty/core/Cell.hpp>
+#include <ventty/screen/Window.h>
 
 #include <string>
 #include <vector>
@@ -17,7 +17,7 @@ public:
     ~AnsiRenderer() = default;
 
     /// Render the screen contents to stdout (diff-based).
-    void render(Screen const & screen);
+    void render(Window const & window);
 
     /// Force full redraw on next render().
     void invalidate();
