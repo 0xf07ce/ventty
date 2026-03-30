@@ -1,4 +1,4 @@
-#include <ventty/Color.h>
+#include <ventty/core/Color.h>
 
 #include <cassert>
 #include <cstdio>

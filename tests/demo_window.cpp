@@ -12,13 +12,13 @@ using namespace ventty;
 
 int main()
 {
-    AnsiTerminal term;
+    Terminal term;
     if (!term.init())
         return 1;
 
-    Color const darkBg1{20, 20, 40};
-    Color const darkBg2{40, 20, 20};
-    Color const darkBg3{20, 40, 20};
+    Color const darkBg1 { 20, 20, 40 };
+    Color const darkBg2 { 40, 20, 20 };
+    Color const darkBg3 { 20, 40, 20 };
 
     // Background pattern
     for (int y = 0; y < term.rows(); ++y)
@@ -56,11 +56,11 @@ int main()
     w3->drawText(2, 2, "Show/Hide: 1,2,3", Colors::WHITE, darkBg3);
     w3->setZOrder(3);
 
-    Window * windows[] = {w1, w2, w3};
+    Window * windows[] = { w1, w2, w3 };
     int focused = 0;
     int const WIN_COUNT = 3;
 
-    Color const focusColors[] = {Colors::CYAN, Colors::MAGENTA, Colors::GREEN};
+    Color const focusColors[] = { Colors::CYAN, Colors::MAGENTA, Colors::GREEN };
 
     auto highlight = [&]()
     {
@@ -103,9 +103,9 @@ int main()
         int wx = w->x();
         int wy = w->y();
 
-        if (ev.key == KeyEvent::Key::Up)    wy--;
-        if (ev.key == KeyEvent::Key::Down)  wy++;
-        if (ev.key == KeyEvent::Key::Left)  wx--;
+        if (ev.key == KeyEvent::Key::Up) wy--;
+        if (ev.key == KeyEvent::Key::Down) wy++;
+        if (ev.key == KeyEvent::Key::Left) wx--;
         if (ev.key == KeyEvent::Key::Right) wx++;
 
         w->setPosition(wx, wy);
@@ -125,13 +125,12 @@ int main()
     // Status bar
     term.fill(0, term.rows() - 1, term.cols(), 1, U' ', Colors::BLACK, Colors::CYAN);
     term.drawText(1, term.rows() - 1,
-                 "Tab: focus | Arrows: move | 1-3: toggle | q: quit",
-                 Colors::WHITE, Colors::CYAN, Attr::Bold);
+        "Tab: focus | Arrows: move | 1-3: toggle | q: quit",
+        Colors::WHITE, Colors::CYAN, Attr::Bold);
 
     while (term.isRunning())
     {
-        while (term.pollEvent())
-            ;
+        while (term.pollEvent());
         term.render();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }

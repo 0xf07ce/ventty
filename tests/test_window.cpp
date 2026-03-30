@@ -1,5 +1,5 @@
-#include <ventty/Window.h>
-#include <ventty/Color.h>
+#include <ventty/core/Window.h>
+#include <ventty/core/Color.h>
 
 #include <cassert>
 #include <cstdio>

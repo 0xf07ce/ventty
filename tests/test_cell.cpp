@@ -1,4 +1,4 @@
-#include <ventty/Cell.h>
+#include <ventty/core/Cell.hpp>
 
 #include <cassert>
 #include <cstdio>

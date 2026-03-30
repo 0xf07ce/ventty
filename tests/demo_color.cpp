@@ -13,7 +13,7 @@ using namespace ventty;
 
 int main()
 {
-    AnsiTerminal term;
+    Terminal term;
     if (!term.init())
         return 1;
 

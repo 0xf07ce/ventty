@@ -13,12 +13,14 @@ using namespace ventty;
 
 int main()
 {
-    gfx::GfxTerminal term;
-    if (!term.init(80, 25, "ventty::gfx Demo", "assets/fonts/IyagiGGC.ttf", 16.0f))
+    GfxTerminal term;
+    if (!term.init(80, 25, "ventty::gfx Demo"))
     {
         std::fprintf(stderr, "Failed to initialize terminal\n");
         return 1;
     }
+
+    term.loadBuiltinFont();
 
     Style const cyan { Colors::CYAN, Colors::BLACK };
     Style const yellowBold { Colors::YELLOW, Colors::BLACK, Attr::Bold };
