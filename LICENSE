@@ -35,3 +35,15 @@ The Ultimate Oldschool PC Font Pack
   Source: https://int10h.org/oldschool-pc-fonts/
   License: CC BY-SA 4.0 (Creative Commons Attribution-ShareAlike 4.0 International)
   Files: tools/fonts/Px437_IBM_PGC.ttf, tools/fonts/Px437_IBM_VGA_8x14.ttf
+
+SDL3
+  Author: Sam Lantinga and SDL contributors
+  Source: https://github.com/libsdl-org/SDL
+  License: zlib License
+  Usage: Linked as graphics backend (optional, auto-fetched if not installed)
+
+stb_image
+  Author: Sean Barrett (nothings)
+  Source: https://github.com/nothings/stb
+  License: MIT / Public Domain (dual-licensed)
+  Files: dep/include/stb/stb_image.h

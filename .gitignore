@@ -5,7 +5,5 @@
 cmake-build-*/
 build/
 local/
-AGENTS.md
-CLAUDE.md
 .env
 local.cmake
