@@ -9,6 +9,8 @@
 
 A modern C++20 terminal UI library designed for both humans and AI agents.
 
+[한국어](README.ko.md)
+
 ---
 
 ## Overview
