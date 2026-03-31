@@ -46,9 +46,6 @@ target_include_directories(ventty PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (VENTTY_BUILD_GFX)
 
-    find_package(SDL3 REQUIRED)
-    find_package(SDL3_image REQUIRED)
-
     add_library(ventty_gfx STATIC
         ventty/gfx/GfxFont.h
         ventty/gfx/GfxFont.cpp
