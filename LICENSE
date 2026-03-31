@@ -46,4 +46,4 @@ stb_image
   Author: Sean Barrett (nothings)
   Source: https://github.com/nothings/stb
   License: MIT / Public Domain (dual-licensed)
-  Files: dep/include/stb/stb_image.h
+  Files: deps/include/stb/stb_image.h
