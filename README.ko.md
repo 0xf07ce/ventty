@@ -62,7 +62,7 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 ```bash
 sudo apt-get install -y \
   libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
-  libxfixes-dev libxss-dev libwayland-dev libxkbcommon-dev \
+  libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev \
   libegl-dev libgl-dev libgles-dev \
   libasound2-dev libpulse-dev libpipewire-0.3-dev
 ```
