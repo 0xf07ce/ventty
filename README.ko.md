@@ -51,7 +51,7 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 - CMake >= 3.20
 - C++20 컴파일러
 - POSIX 호환 시스템 (Linux, macOS, BSD)
-- SDL3, SDL3_image (그래픽 백엔드용, 선택사항 — 미설치 시 자동 획득)
+- SDL3 (그래픽 백엔드용, 선택사항 — 미설치 시 자동 획득)
 
 ## 빌드
 
@@ -75,7 +75,7 @@ cmake --build build
 
 | 옵션 | 기본값 | 설명 |
 |---|---|---|
-| `VENTTY_BUILD_GFX` | `ON` | SDL3 그래픽 백엔드 빌드 |
+| `VENTTY_BUILD_GFX` | `OFF` | SDL3 그래픽 백엔드 빌드 |
 | `VENTTY_BUILD_TESTS` | `ON` | 단위 테스트 빌드 |
 | `VENTTY_BUILD_EXAMPLES` | `ON` | 예제 프로그램 빌드 |
 

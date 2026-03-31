@@ -51,7 +51,7 @@ When an AI agent uses ncurses directly, it must deal with a decades-old C API fu
 - CMake >= 3.20
 - C++20 compiler
 - POSIX-compliant system (Linux, macOS, BSD)
-- SDL3, SDL3_image (for graphical backend, optional — auto-fetched if not installed)
+- SDL3 (for graphical backend, optional — auto-fetched if not installed)
 
 ## Build
 
@@ -75,7 +75,7 @@ Options:
 
 | Option | Default | Description |
 |---|---|---|
-| `VENTTY_BUILD_GFX` | `ON` | Build SDL3 graphical backend |
+| `VENTTY_BUILD_GFX` | `OFF` | Build SDL3 graphical backend |
 | `VENTTY_BUILD_TESTS` | `ON` | Build unit tests |
 | `VENTTY_BUILD_EXAMPLES` | `ON` | Build example programs |
 
