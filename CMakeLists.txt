@@ -10,7 +10,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(local.cmake OPTIONAL)
 endif ()
 
-option(VENTTY_BUILD_GFX      "Build with Graphics Support"    ON)
+option(VENTTY_BUILD_GFX      "Build with Graphics Support"    OFF)
 option(VENTTY_BUILD_TESTS    "Build Tests"                    ON)
 option(VENTTY_BUILD_EXAMPLES "Build Examples"                 ON)
 
@@ -21,8 +21,6 @@ option(VENTTY_BUILD_EXAMPLES "Build Examples"                 ON)
 #   2. If not found, fetch from GitHub via FetchContent.
 if (VENTTY_BUILD_GFX)
     find_package(SDL3 QUIET)
-    find_package(SDL3_image QUIET)
-
     if (NOT SDL3_FOUND)
         include(FetchContent)
         message(STATUS "SDL3 not found locally, fetching from GitHub...")
@@ -32,17 +30,6 @@ if (VENTTY_BUILD_GFX)
             GIT_SHALLOW    TRUE
         )
         FetchContent_MakeAvailable(SDL3)
-    endif ()
-
-    if (NOT SDL3_image_FOUND)
-        include(FetchContent)
-        message(STATUS "SDL3_image not found locally, fetching from GitHub...")
-        FetchContent_Declare(SDL3_image
-            GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
-            GIT_TAG        main
-            GIT_SHALLOW    TRUE
-        )
-        FetchContent_MakeAvailable(SDL3_image)
     endif ()
 endif ()
 

@@ -65,10 +65,11 @@ if (VENTTY_BUILD_GFX)
         # umbrella
         ventty/ventty_gfx.h
     )
-    target_include_directories(ventty_gfx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    target_include_directories(ventty_gfx PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/dep/include)
     target_link_libraries(ventty_gfx PUBLIC
         ventty
-        SDL3::SDL3
-        SDL3_image::SDL3_image)
+        SDL3::SDL3)
 
 endif ()

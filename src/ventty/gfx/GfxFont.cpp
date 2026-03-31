@@ -5,7 +5,8 @@
 #include "fonts/EmbeddedFonts.h"
 
 #include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 #include <fstream>
 #include <sstream>
@@ -55,16 +56,27 @@ void GfxFont::shutdown()
 
 bool GfxFont::load(SDL_Renderer * renderer, std::string const & pngPath, std::string const & cfntPath)
 {
-    SDL_Surface * surface = IMG_Load(pngPath.c_str());
-    if (!surface)
+    int imgW = 0, imgH = 0, imgCh = 0;
+    unsigned char * pixels = stbi_load(pngPath.c_str(), &imgW, &imgH, &imgCh, 4);
+    if (!pixels)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-            "Failed to load font atlas image: %s (%s)", pngPath.c_str(), SDL_GetError());
+            "Failed to load font atlas image: %s (%s)", pngPath.c_str(), stbi_failure_reason());
+        return false;
+    }
+
+    SDL_Surface * surface = SDL_CreateSurfaceFrom(imgW, imgH, SDL_PIXELFORMAT_RGBA32, pixels, imgW * 4);
+    if (!surface)
+    {
+        stbi_image_free(pixels);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+            "Failed to create surface from atlas: %s", SDL_GetError());
         return false;
     }
 
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
+    stbi_image_free(pixels);
     if (!texture)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
@@ -98,16 +110,21 @@ bool GfxFont::load(SDL_Renderer * renderer, std::string const & pngPath, std::st
 
 static SDL_Texture * loadPngFromMemory(SDL_Renderer * renderer, unsigned char const * data, unsigned int size)
 {
-    SDL_IOStream * io = SDL_IOFromConstMem(data, size);
-    if (!io)
+    int imgW = 0, imgH = 0, imgCh = 0;
+    unsigned char * pixels = stbi_load_from_memory(data, static_cast<int>(size), &imgW, &imgH, &imgCh, 4);
+    if (!pixels)
         return nullptr;
 
-    SDL_Surface * surface = IMG_Load_IO(io, true);
+    SDL_Surface * surface = SDL_CreateSurfaceFrom(imgW, imgH, SDL_PIXELFORMAT_RGBA32, pixels, imgW * 4);
     if (!surface)
+    {
+        stbi_image_free(pixels);
         return nullptr;
+    }
 
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
+    stbi_image_free(pixels);
     if (!texture)
         return nullptr;
 
