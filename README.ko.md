@@ -2,7 +2,7 @@
 
 ![ventty](docs/ventty.png)
 
-![build](https://github.com/ventty-studio/ventty/actions/workflows/build.yml/badge.svg)
+![build](https://github.com/0xf07ce/ventty/actions/workflows/build.yml/badge.svg)
 ![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
