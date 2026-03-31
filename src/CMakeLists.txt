@@ -67,7 +67,7 @@ if (VENTTY_BUILD_GFX)
     )
     target_include_directories(ventty_gfx PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/deps/include)
+        ${CMAKE_CURRENT_SOURCE_DIR}/../deps/include)
     target_link_libraries(ventty_gfx PUBLIC
         ventty
         SDL3::SDL3)
