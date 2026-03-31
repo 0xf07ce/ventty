@@ -1,3 +1,6 @@
+// Copyright (c) 2026 ventty-studio
+// SPDX-License-Identifier: MIT
+
 #include "Input.h"
 
 #include <poll.h>

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 ventty-studio
+// SPDX-License-Identifier: MIT
+
 #include "GfxTerminal.h"
 
 #include <ventty/core/Utf8.h>

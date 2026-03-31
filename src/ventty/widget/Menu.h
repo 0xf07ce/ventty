@@ -1,3 +1,6 @@
+// Copyright (c) 2026 ventty-studio
+// SPDX-License-Identifier: MIT
+
 #ifndef VENTTY_WIDGET_MENU_H
 #define VENTTY_WIDGET_MENU_H
 
