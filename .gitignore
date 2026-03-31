@@ -2,8 +2,8 @@
 .idea/
 .vscode/
 .claude/
-build/
 cmake-build-*/
+local/
 AGENTS.md
 CLAUDE.md
 .env

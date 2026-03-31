@@ -5,9 +5,9 @@ gen_font_atlas.py - Bitmap font atlas generator for the Dice-n-Destiny/RetroTerm
 Generates a PNG atlas and BMFont-format .fnt metadata file from a TTF font.
 
 Usage:
-    python gen_font_atlas.py --font /path/to/font.ttf --size 8x16 --range cp437 --output assets/cp437_8x16
-    python gen_font_atlas.py --font /path/to/font.ttf --size 16x16 --range hangul --output assets/hangul_16x16
-    python gen_font_atlas.py --font /path/to/font.ttf --size 8x16 --range U+0020-U+007E --output assets/ascii_8x16
+    python gen_font_atlas.py --font /path/to/font.ttf --size 8x16 --range cp437 --output ../local/assets/cp437_8x16
+    python gen_font_atlas.py --font /path/to/font.ttf --size 16x16 --range hangul --output ../local/assets/hangul_16x16
+    python gen_font_atlas.py --font /path/to/font.ttf --size 8x16 --range U+0020-U+007E --output ../local/assets/ascii_8x16
 """
 
 import argparse

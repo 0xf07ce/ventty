@@ -3,11 +3,11 @@
 
 Usage: python embed_font.py
 
-Reads PNG + FNT from build/generated/font/
+Reads PNG + FNT from local/assets/
 Writes:
   - src/ventty/gfx/fonts/{name}.cpp  (PNG hex + codepage/range constants)
   - src/ventty/gfx/fonts/EmbeddedFonts.h
-  - build/generated/font/{name}.cfnt  (compact font metadata for file-based loading)
+  - local/assets/{name}.cfnt  (compact font metadata for file-based loading)
 """
 
 from pathlib import Path
@@ -130,7 +130,7 @@ def generate_header(font_infos):
 
 def main():
     root = Path(__file__).resolve().parent.parent
-    assets_dir = root / "build" / "generated" / "font"
+    assets_dir = root / "local" / "assets"
     cpp_dir = root / "src" / "ventty" / "gfx" / "fonts"
     cpp_dir.mkdir(parents=True, exist_ok=True)
 

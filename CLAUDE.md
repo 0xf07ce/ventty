@@ -49,3 +49,7 @@ cmake --build cmake-build-agent
 - `override` on virtual overrides (`modernize-use-override`)
 - Prefer in-class member initialization (`modernize-use-default-member-init`)
 - Range-for with `auto const &` to avoid copies (`performance-for-range-copy`)
+
+## Git
+
+- **Do NOT** add `Co-Authored-By` lines to commit messages
