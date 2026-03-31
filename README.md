@@ -55,19 +55,16 @@ When an AI agent uses ncurses directly, it must deal with a decades-old C API fu
 
 ## Build
 
-### Linux (Ubuntu/Debian)
+### Using Docker (recommended for Linux)
 
-Install dependencies first:
+A Docker image with all build dependencies pre-installed is provided:
 
 ```bash
-sudo apt-get install -y \
-  libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
-  libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev \
-  libegl-dev libgl-dev libgles-dev \
-  libasound2-dev libpulse-dev libpipewire-0.3-dev
+docker build -t ventty-build -f docker/Dockerfile .
+docker run --rm -v $(pwd):/workspace ventty-build bash -c "cmake -S . -B build && cmake --build build"
 ```
 
-### Build
+### Native build (macOS)
 
 ```bash
 cmake -S . -B build

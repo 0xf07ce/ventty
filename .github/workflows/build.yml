@@ -7,24 +7,23 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
+  build-linux:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
+      - name: Build Docker image
+        run: docker build -t ventty-build -f docker/Dockerfile .
+
+      - name: Configure, Build & Test
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
-            libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev \
-            libegl-dev libgl-dev libgles-dev \
-            libasound2-dev libpulse-dev libpipewire-0.3-dev
+          docker run --rm -v ${{ github.workspace }}:/workspace ventty-build \
+            bash -c "cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure"
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Configure
         run: cmake -S . -B build

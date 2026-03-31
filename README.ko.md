@@ -55,19 +55,16 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 
 ## 빌드
 
-### Linux (Ubuntu/Debian)
+### Docker 사용 (Linux 권장)
 
-먼저 의존성을 설치합니다:
+빌드 의존성이 포함된 Docker 이미지를 제공합니다:
 
 ```bash
-sudo apt-get install -y \
-  libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
-  libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev \
-  libegl-dev libgl-dev libgles-dev \
-  libasound2-dev libpulse-dev libpipewire-0.3-dev
+docker build -t ventty-build -f docker/Dockerfile .
+docker run --rm -v $(pwd):/workspace ventty-build bash -c "cmake -S . -B build && cmake --build build"
 ```
 
-### 빌드
+### 네이티브 빌드 (macOS)
 
 ```bash
 cmake -S . -B build
