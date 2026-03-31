@@ -14,156 +14,156 @@ namespace ventty
 class Window
 {
 public:
-    /// 위치와 크기를 지정하여 윈도우 생성
+    /// Construct a window with position and size
     Window(int x, int y, int w, int h);
 
     // -- drawing --
 
-    /// 기본 스타일로 전체 화면 지우기
+    /// Clear entire window with default style
     void clear();
 
-    /// 지정한 배경색으로 전체 화면 지우기
+    /// Clear entire window with specified background color
     void clear(Color bg);
 
-    /// 지정한 스타일로 전체 화면 지우기
+    /// Clear entire window with specified style
     void clear(Style const & style);
 
-    /// 지정한 위치에 스타일 적용하여 문자 출력
+    /// Draw a character at the given position with style
     void putChar(int x, int y, char32_t cp, Style const & style);
 
-    /// 지정한 위치에 전경/배경/속성으로 문자 출력
+    /// Draw a character at the given position with fg/bg/attr
     void putChar(int x, int y, char32_t cp, Color fg, Color bg, Attr attr = Attr::None);
 
-    /// 지정한 위치에 스타일 적용하여 텍스트 출력
+    /// Draw text at the given position with style
     void drawText(int x, int y, std::string_view text, Style const & style);
 
-    /// 지정한 위치에 전경/배경/속성으로 텍스트 출력
+    /// Draw text at the given position with fg/bg/attr
     void drawText(int x, int y, std::string_view text, Color fg, Color bg, Attr attr = Attr::None);
 
-    /// 지정한 영역을 문자와 스타일로 채우기
+    /// Fill a region with a character and style
     void fill(int x, int y, int w, int h, char32_t cp, Style const & style);
 
-    /// 지정한 영역을 문자와 전경/배경으로 채우기
+    /// Fill a region with a character and fg/bg colors
     void fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg);
 
     /// Print text with automatic line wrapping + scrollback
     void print(std::string_view text, Style const & style);
     void print(std::string_view text, Color fg, Color bg);
 
-    /// 윈도우 테두리에 박스 그리기 (단선 또는 이중선)
+    /// Draw a box border around the window (single or double line)
     void drawBox(Style const & style, bool doubleLine = false);
 
-    /// 윈도우 테두리에 전경/배경 색으로 박스 그리기
+    /// Draw a box border around the window with fg/bg colors
     void drawBox(Color fg, Color bg, bool doubleLine = false);
 
-    /// 임의 위치에 박스 그리기 (단선 또는 이중선)
+    /// Draw a box at arbitrary position (single or double line)
     void drawBox(int x, int y, int w, int h, Style const & style, bool doubleLine = false);
 
-    /// 수평 선 그리기
+    /// Draw a horizontal line
     void drawHLine(int x, int y, int length, char32_t ch, Style const & style);
 
-    /// 수직 선 그리기
+    /// Draw a vertical line
     void drawVLine(int x, int y, int length, char32_t ch, Style const & style);
 
     // -- scrollback --
 
-    /// 스크롤백 버퍼 활성화 (최대 줄 수 지정)
+    /// Enable scrollback buffer with max line count
     void enableScroll(int scrollbackLines);
 
-    /// 지정한 줄 수만큼 스크롤 (양수 = 위로)
+    /// Scroll by the given number of lines (positive = up)
     void scroll(int lines);
 
-    /// 현재 스크롤 오프셋 반환
+    /// Return current scroll offset
     int scrollOffset() const;
 
-    /// 스크롤백 버퍼에 저장된 줄 수 반환
+    /// Return number of lines stored in scrollback buffer
     int scrollbackSize() const;
 
     // -- position / visibility --
 
-    /// X 좌표(열) 반환
+    /// Return X coordinate (column)
     int x() const;
 
-    /// Y 좌표(행) 반환
+    /// Return Y coordinate (row)
     int y() const;
 
-    /// 윈도우 너비 반환
+    /// Return window width
     int width() const;
 
-    /// 윈도우 높이 반환
+    /// Return window height
     int height() const;
 
-    /// 윈도우 위치 설정
+    /// Set window position
     void setPosition(int x, int y);
 
-    /// 윈도우 크기 변경
+    /// Resize the window
     void resize(int w, int h);
 
-    /// Z 순서 반환 (높을수록 앞에 표시)
+    /// Return Z order (higher values render in front)
     int zOrder() const;
 
-    /// Z 순서 설정
+    /// Set Z order
     void setZOrder(int z);
 
-    /// 표시 여부 반환
+    /// Return visibility state
     bool visible() const;
 
-    /// 표시 여부 설정
+    /// Set visibility
     void setVisible(bool v);
 
-    /// 변경 사항이 있는지 확인
+    /// Check if there are pending changes
     bool isDirty() const;
 
-    /// 변경됨으로 표시
+    /// Mark as dirty
     void markDirty();
 
-    /// 변경 플래그 초기화
+    /// Clear dirty flag
     void clearDirty();
 
     // -- cell access --
 
-    /// 지정 좌표의 셀 참조 반환
+    /// Return reference to cell at given coordinates
     Cell & cellAt(int x, int y);
 
-    /// 지정 좌표의 셀 상수 참조 반환
+    /// Return const reference to cell at given coordinates
     Cell const & cellAt(int x, int y) const;
 
-    /// 렌더러용 버퍼 직접 접근 포인터
+    /// Direct buffer access pointer for renderer
     Cell const * data() const;
 
-    /// 버퍼 크기 (셀 수) 반환
+    /// Return buffer size (cell count)
     int bufferSize() const;
 
     // -- cursor for print() --
 
-    /// print() 커서의 X 좌표 반환
+    /// Return X coordinate of print() cursor
     int cursorX() const;
 
-    /// print() 커서의 Y 좌표 반환
+    /// Return Y coordinate of print() cursor
     int cursorY() const;
 
-    /// print() 커서 위치 설정
+    /// Set print() cursor position
     void setCursor(int x, int y);
 
 private:
-    int _x, _y;           ///< 윈도우 위치
-    int _width, _height;  ///< 윈도우 크기
-    int _zOrder = 0;      ///< Z 순서
-    bool _visible = true; ///< 표시 여부
-    bool _dirty = true;   ///< 변경 플래그
+    int _x, _y;           ///< Window position
+    int _width, _height;  ///< Window size
+    int _zOrder = 0;      ///< Z order
+    bool _visible = true; ///< Visibility flag
+    bool _dirty = true;   ///< Dirty flag
 
-    std::vector<Cell> _buffer; ///< 셀 버퍼
+    std::vector<Cell> _buffer; ///< Cell buffer
 
     // scrollback
-    std::vector<std::vector<Cell>> _scrollback; ///< 스크롤백 버퍼
-    int _scrollOffset = 0;                      ///< 현재 스크롤 오프셋
-    int _maxScrollback = 0;                     ///< 최대 스크롤백 줄 수
+    std::vector<std::vector<Cell>> _scrollback; ///< Scrollback buffer
+    int _scrollOffset = 0;                      ///< Current scroll offset
+    int _maxScrollback = 0;                     ///< Max scrollback line count
 
     // cursor for print()
-    int _cursorX = 0; ///< print() 커서 X 좌표
-    int _cursorY = 0; ///< print() 커서 Y 좌표
+    int _cursorX = 0; ///< print() cursor X coordinate
+    int _cursorY = 0; ///< print() cursor Y coordinate
 
-    /// 버퍼를 한 줄 위로 스크롤
+    /// Scroll buffer up by one line
     void scrollBufferUp();
 };
 } // namespace ventty

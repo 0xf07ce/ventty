@@ -15,52 +15,52 @@ class Window;
 class GfxRenderer
 {
 public:
-    /// 기본 생성자
+    /// Default constructor
     GfxRenderer() = default;
 
-    /// 소멸자 (SDL 리소스 해제)
+    /// Destructor (releases SDL resources)
     ~GfxRenderer();
 
     GfxRenderer(GfxRenderer const &) = delete;
     GfxRenderer & operator=(GfxRenderer const &) = delete;
 
-    /// SDL 윈도우 및 렌더러 초기화
+    /// Initialize SDL window and renderer
     bool init(int cols, int rows, int cellW, int cellH, std::string const & title, int scale = 0);
 
-    /// SDL 리소스 해제
+    /// Release SDL resources
     void shutdown();
 
-    /// 프레임 렌더링 시작
+    /// Begin frame rendering
     void beginFrame();
 
-    /// 프레임 렌더링 완료 및 표시
+    /// Finish frame rendering and present
     void endFrame();
 
-    /// 단일 셀을 픽셀 좌표에 렌더링
+    /// Render a single cell at pixel coordinates
     void renderCell(ventty::Cell const & cell, int px, int py, GfxFont & font, int cellW, int cellH);
 
-    /// 윈도우의 모든 셀 렌더링
+    /// Render all cells of a window
     void renderWindow(ventty::Window & win, GfxFont & font);
 
-    /// SDL 윈도우 포인터 반환
+    /// Return SDL window pointer
     SDL_Window * sdlWindow() const;
 
-    /// SDL 렌더러 포인터 반환
+    /// Return SDL renderer pointer
     SDL_Renderer * sdlRenderer() const;
 
-    /// 스케일 배율 반환
+    /// Return scale factor
     int scale() const;
 
-    /// 논리적 크기 업데이트
+    /// Update logical size
     void updateLogicalSize(int fbW, int fbH);
 
 private:
-    SDL_Window * _sdlWindow = nullptr;  ///< SDL 윈도우
-    SDL_Renderer * _renderer = nullptr; ///< SDL 렌더러
-    int _scale = 1;                     ///< 스케일 배율
-    int _fbWidth = 0;                   ///< 프레임 버퍼 너비
-    int _fbHeight = 0;                  ///< 프레임 버퍼 높이
-    int _cellW = 8;                     ///< 셀 너비 (픽셀)
-    int _cellH = 16;                    ///< 셀 높이 (픽셀)
+    SDL_Window * _sdlWindow = nullptr;  ///< SDL window
+    SDL_Renderer * _renderer = nullptr; ///< SDL renderer
+    int _scale = 1;                     ///< Scale factor
+    int _fbWidth = 0;                   ///< Framebuffer width
+    int _fbHeight = 0;                  ///< Framebuffer height
+    int _cellW = 8;                     ///< Cell width (pixels)
+    int _cellH = 16;                    ///< Cell height (pixels)
 };
 } // namespace ventty

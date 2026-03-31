@@ -9,68 +9,68 @@
 
 namespace ventty
 {
-/// 대화상자 결과
+/// Dialog result
 enum class DialogResult
 {
-    None,   ///< 결과 없음
-    Ok,     ///< 확인
-    Cancel, ///< 취소
-    Yes,    ///< 예
-    No,     ///< 아니오
+    None,   ///< No result
+    Ok,     ///< OK
+    Cancel, ///< Cancel
+    Yes,    ///< Yes
+    No,     ///< No
 };
 
-/// 메시지 대화상자 위젯
+/// Message dialog widget
 class Dialog : public Widget
 {
 public:
-    /// 생성자
+    /// Constructor
     Dialog();
 
-    /// 제목 설정
+    /// Set title
     void setTitle(std::string title);
 
-    /// 제목 반환
+    /// Return title
     std::string const & title() const;
 
-    /// 메시지 설정
+    /// Set message
     void setMessage(std::string message);
 
-    /// 메시지 반환
+    /// Return message
     std::string const & message() const;
 
-    /// 버튼 추가 (라벨과 결과값)
+    /// Add button (label and result value)
     void addButton(std::string label, DialogResult result);
 
-    /// 모든 버튼 제거
+    /// Remove all buttons
     void clearButtons();
 
-    /// 대화상자 결과 반환
+    /// Return dialog result
     DialogResult result() const;
 
-    /// 결과값 설정
+    /// Set result value
     void setResult(DialogResult r);
 
-    /// 선택된 버튼 인덱스 반환
+    /// Return selected button index
     int selectedButton() const;
 
-    /// 선택 버튼 인덱스 설정
+    /// Set selected button index
     void setSelectedButton(int idx);
 
-    /// 대화상자를 윈도우에 그리기
+    /// Draw dialog to window
     void draw(Window & window) override;
 
-    /// 키 이벤트 처리
+    /// Handle key event
     bool handleKey(KeyEvent const & event) override;
 
-    /// 내용에 맞게 크기 자동 조정
+    /// Auto-size to fit content
     void autoSize(int screenWidth, int screenHeight);
 
 private:
-    std::string _title;                                         ///< 대화상자 제목
-    std::string _message;                                       ///< 대화상자 메시지
-    std::vector<std::pair<std::string, DialogResult>> _buttons; ///< 버튼 목록 (라벨, 결과값 쌍)
-    int _selectedButton = 0;                                    ///< 선택된 버튼 인덱스
-    DialogResult _result = DialogResult::None;                  ///< 대화상자 결과
+    std::string _title;                                         ///< Dialog title
+    std::string _message;                                       ///< Dialog message
+    std::vector<std::pair<std::string, DialogResult>> _buttons; ///< Button list (label, result pairs)
+    int _selectedButton = 0;                                    ///< Selected button index
+    DialogResult _result = DialogResult::None;                  ///< Dialog result
 };
 } // namespace ventty
 

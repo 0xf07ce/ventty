@@ -12,99 +12,97 @@ struct SDL_Window;
 namespace ventty
 {
 /// IME committed text event
-/// IME 확정 텍스트 이벤트
 struct TextInputEvent
 {
-    std::string text; ///< 확정된 텍스트
+    std::string text; ///< Committed text
 };
 
 /// IME composing text event
-/// IME 조합 중 텍스트 이벤트
 struct TextEditingEvent
 {
-    std::string text; ///< 조합 중인 텍스트
-    int cursor = 0;   ///< 조합 커서 위치
-    int length = 0;   ///< 조합 텍스트 길이
+    std::string text; ///< Composing text
+    int cursor = 0;   ///< Composing cursor position
+    int length = 0;   ///< Composing text length
 };
 
-/// 텍스트 입력 콜백 타입
+/// Text input callback type
 using TextInputCallback = std::function<void(TextInputEvent const &)>;
 
-/// 텍스트 편집 콜백 타입
+/// Text editing callback type
 using TextEditingCallback = std::function<void(TextEditingEvent const &)>;
 
-/// SDL 이벤트를 ventty 이벤트로 변환하는 입력 처리기
+/// Input handler that converts SDL events to ventty events
 class GfxInput
 {
 public:
-    /// 셀 크기 설정 (픽셀)
+    /// Set cell size (pixels)
     void setCellSize(int cellW, int cellH);
 
-    /// 스케일 배율 설정
+    /// Set scale factor
     void setScale(int scale);
 
-    /// SDL 이벤트 처리 (처리했으면 true 반환)
+    /// Process SDL event (returns true if handled)
     bool processEvent(SDL_Event const & event);
 
-    /// 프레임 종료 시 호출
+    /// Called at end of frame
     void endFrame();
 
     // Callbacks (ventty-compatible types)
 
-    /// 키 이벤트 콜백 등록
+    /// Register key event callback
     void onKey(ventty::KeyCallback cb);
 
-    /// 키 이벤트 콜백 제거
+    /// Remove key event callbacks
     void clearKeyCallbacks();
 
-    /// 텍스트 편집 콜백 제거
+    /// Remove text editing callbacks
     void clearTextEditingCallbacks();
 
-    /// 마우스 이벤트 콜백 등록
+    /// Register mouse event callback
     void onMouse(ventty::MouseCallback cb);
 
-    /// 텍스트 입력 콜백 등록
+    /// Register text input callback
     void onTextInput(TextInputCallback cb);
 
-    /// 텍스트 편집 콜백 등록
+    /// Register text editing callback
     void onTextEditing(TextEditingCallback cb);
 
     // IME
 
-    /// SDL 윈도우 설정 (IME용)
+    /// Set SDL window (for IME)
     void setWindow(SDL_Window * window);
 
-    /// 텍스트 입력(IME) 시작
+    /// Start text input (IME)
     void startTextInput();
 
-    /// 텍스트 입력(IME) 중지
+    /// Stop text input (IME)
     void stopTextInput();
 
-    /// 텍스트 입력 활성 여부 확인
+    /// Check if text input is active
     bool isTextInputActive() const;
 
-    /// 마우스 셀 X 좌표 반환
+    /// Return mouse cell X coordinate
     int mouseX() const;
 
-    /// 마우스 셀 Y 좌표 반환
+    /// Return mouse cell Y coordinate
     int mouseY() const;
 
 private:
-    /// 픽셀 좌표를 셀 좌표로 변환
+    /// Convert pixel coordinates to cell coordinates
     std::pair<int, int> pixelToCell(float px, float py) const;
 
-    int _cellWidth = 8;   ///< 셀 너비 (픽셀)
-    int _cellHeight = 16; ///< 셀 높이 (픽셀)
-    int _scale = 1;       ///< 스케일 배율
-    int _mouseCellX = 0;  ///< 마우스 셀 X 좌표
-    int _mouseCellY = 0;  ///< 마우스 셀 Y 좌표
+    int _cellWidth = 8;   ///< Cell width (pixels)
+    int _cellHeight = 16; ///< Cell height (pixels)
+    int _scale = 1;       ///< Scale factor
+    int _mouseCellX = 0;  ///< Mouse cell X coordinate
+    int _mouseCellY = 0;  ///< Mouse cell Y coordinate
 
-    SDL_Window * _window = nullptr; ///< SDL 윈도우
-    bool _textInputActive = false;  ///< 텍스트 입력 활성 여부
+    SDL_Window * _window = nullptr; ///< SDL window
+    bool _textInputActive = false;  ///< Whether text input is active
 
-    std::vector<ventty::KeyCallback> _keyCallbacks;         ///< 키 이벤트 콜백 목록
-    std::vector<ventty::MouseCallback> _mouseCallbacks;     ///< 마우스 이벤트 콜백 목록
-    std::vector<TextInputCallback> _textInputCallbacks;     ///< 텍스트 입력 콜백 목록
-    std::vector<TextEditingCallback> _textEditingCallbacks; ///< 텍스트 편집 콜백 목록
+    std::vector<ventty::KeyCallback> _keyCallbacks;         ///< Key event callback list
+    std::vector<ventty::MouseCallback> _mouseCallbacks;     ///< Mouse event callback list
+    std::vector<TextInputCallback> _textInputCallbacks;     ///< Text input callback list
+    std::vector<TextEditingCallback> _textEditingCallbacks; ///< Text editing callback list
 };
 } // namespace ventty

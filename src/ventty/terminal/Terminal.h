@@ -13,135 +13,135 @@ namespace ventty
 class Terminal : public TerminalBase
 {
 public:
-    /// 생성자
+    /// Constructor
     Terminal();
 
-    /// 소멸자 (raw 모드 복원)
+    /// Destructor (restores raw mode)
     ~Terminal() override;
 
-    /// raw 모드 진입, 대체 화면 전환, 마우스 활성화
+    /// Enter raw mode, switch to alternate screen, enable mouse
     bool init();
 
-    /// 터미널 종료 및 리소스 해제
+    /// Shut down the terminal and release resources
     void shutdown() override;
 
-    /// 이벤트 폴링
+    /// Poll for events
     bool pollEvent() override;
 
-    /// 화면 렌더링
+    /// Render the screen
     void render() override;
 
-    /// 전체 화면 강제 다시 그리기
+    /// Force a full screen redraw
     void forceRedraw() override;
 
     // -- drawing on the root screen --
 
-    /// 기본 스타일로 루트 화면 지우기
+    /// Clear the root screen with default style
     void clear() override;
 
-    /// 지정한 배경색으로 루트 화면 지우기
+    /// Clear the root screen with the specified background color
     void clear(Color bg) override;
 
-    /// 기본 스타일로 문자 출력
+    /// Put a character with default style
     void putChar(int x, int y, char32_t cp) override;
 
-    /// 스타일 적용하여 문자 출력
+    /// Put a character with the given style
     void putChar(int x, int y, char32_t cp, Style const & style) override;
 
-    /// 전경/배경/속성으로 문자 출력
+    /// Put a character with foreground, background, and attributes
     void putChar(int x, int y, char32_t cp, Color fg, Color bg,
         Attr attr = Attr::None) override;
 
-    /// 기본 스타일로 텍스트 출력
+    /// Draw text with default style
     void drawText(int x, int y, std::string_view text) override;
 
-    /// 스타일 적용하여 텍스트 출력
+    /// Draw text with the given style
     void drawText(int x, int y, std::string_view text, Style const & style) override;
 
-    /// 전경/배경/속성으로 텍스트 출력
+    /// Draw text with foreground, background, and attributes
     void drawText(int x, int y, std::string_view text, Color fg, Color bg,
         Attr attr = Attr::None) override;
 
-    /// 전경/배경으로 영역 채우기
+    /// Fill a region with foreground and background colors
     void fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg) override;
 
-    /// 스타일 적용하여 영역 채우기
+    /// Fill a region with the given style
     void fill(int x, int y, int w, int h, char32_t cp, Style const & style) override;
 
-    /// 기본 스타일 설정
+    /// Set the default style
     void setDefaultStyle(Style const & style) override;
 
     // -- window management --
 
-    /// 윈도우 생성
+    /// Create a window
     Window * createWindow(int x, int y, int w, int h) override;
 
-    /// 윈도우 제거
+    /// Destroy a window
     void destroyWindow(Window * win) override;
 
     // -- queries --
 
-    /// 터미널 열 수 반환
+    /// Return the number of terminal columns
     int cols() const override;
 
-    /// 터미널 행 수 반환
+    /// Return the number of terminal rows
     int rows() const override;
 
     // -- callbacks --
 
-    /// 키 이벤트 콜백 등록
+    /// Register a key event callback
     void onKey(KeyCallback cb) override;
 
-    /// 마우스 이벤트 콜백 등록
+    /// Register a mouse event callback
     void onMouse(MouseCallback cb) override;
 
-    /// 크기 변경 이벤트 콜백 등록
+    /// Register a resize event callback
     void onResize(ResizeCallback cb) override;
 
     // -- direct cell access --
 
-    /// 지정 좌표의 셀 참조 반환
+    /// Return a mutable reference to the cell at the given coordinates
     Cell & cellAt(int x, int y) override;
 
-    /// 지정 좌표의 셀 상수 참조 반환
+    /// Return a const reference to the cell at the given coordinates
     Cell const & cellAt(int x, int y) const override;
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> _impl; ///< 구현 세부사항 (PIMPL)
+    std::unique_ptr<Impl> _impl; ///< Implementation details (PIMPL)
 
-    int _cols = 0; ///< 터미널 열 수
-    int _rows = 0; ///< 터미널 행 수
+    int _cols = 0; ///< Terminal column count
+    int _rows = 0; ///< Terminal row count
 
-    /// 시그널 핸들러의 긴급 복원을 위한 프렌드 선언
+    /// Friend declaration for emergency restoration by signal handler
     friend void signalHandler(int);
 
-    Style _defaultStyle; ///< 기본 스타일
+    Style _defaultStyle; ///< Default style
 
-    std::vector<Cell> _root;   ///< 루트 (배경) 레이어
-    std::vector<Cell> _screen; ///< 합성된 프레임
-    std::vector<Cell> _prev;   ///< 이전 프레임 (diff 비교용)
-    bool _fullRedraw = true;   ///< 전체 다시 그리기 플래그
+    std::vector<Cell> _root;   ///< Root (background) layer
+    std::vector<Cell> _screen; ///< Composited frame
+    std::vector<Cell> _prev;   ///< Previous frame (for diff comparison)
+    bool _fullRedraw = true;   ///< Full redraw flag
 
-    std::vector<std::unique_ptr<Window>> _windows; ///< 관리 중인 윈도우 목록
+    std::vector<std::unique_ptr<Window>> _windows; ///< Managed window list
 
-    KeyCallback _keyCb;       ///< 키 이벤트 콜백
-    MouseCallback _mouseCb;   ///< 마우스 이벤트 콜백
-    ResizeCallback _resizeCb; ///< 크기 변경 콜백
+    KeyCallback _keyCb;       ///< Key event callback
+    MouseCallback _mouseCb;   ///< Mouse event callback
+    ResizeCallback _resizeCb; ///< Resize callback
 
-    /// 터미널 크기 조회
+    /// Query terminal size
     void querySize();
 
-    /// 윈도우들을 _screen에 합성
+    /// Composite windows onto _screen
     void composite();
 
-    /// 변경된 셀에 대한 ANSI 이스케이프 출력
+    /// Emit ANSI escapes for changed cells
     void emitDiff();
 
-    /// 단일 셀을 ANSI 이스케이프로 출력
+    /// Emit a single cell as ANSI escape sequences
     void emitCell(int x, int y, Cell const & cell);
 
-    /// 크기 변경 처리
+    /// Handle terminal resize
     void handleResize();
 };
 } // namespace ventty

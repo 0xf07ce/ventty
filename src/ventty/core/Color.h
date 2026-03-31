@@ -8,89 +8,58 @@ namespace ventty
 {
 struct Color
 {
-    uint8_t r = 0; ///< 빨간색 채널 (0-255)
-    uint8_t g = 0; ///< 초록색 채널 (0-255)
-    uint8_t b = 0; ///< 파란색 채널 (0-255)
+    uint8_t r = 0; ///< Red channel (0-255)
+    uint8_t g = 0; ///< Green channel (0-255)
+    uint8_t b = 0; ///< Blue channel (0-255)
 
-    /// 기본 생성자 (검정색)
+    /// Default constructor (black)
     constexpr Color() = default;
 
-    /// RGB 값으로 Color 생성
+    /// Construct Color from RGB values
     constexpr Color(uint8_t red, uint8_t green, uint8_t blue)
         : r(red), g(green), b(blue)
     {}
 
-    /// 두 색상이 같은지 비교
+    /// Check equality of two colors
     constexpr bool operator==(Color const & other) const
     {
         return r == other.r && g == other.g && b == other.b;
     }
 
-    /// 두 색상이 다른지 비교
+    /// Check inequality of two colors
     constexpr bool operator!=(Color const & other) const
     {
         return !(*this == other);
     }
 
-    /// 16진수 문자열에서 Color 생성 (예: "#FF0000")
+    /// Construct Color from hex string (e.g., "#FF0000")
     static Color fromHex(std::string_view hex);
 
-    /// 16진수 문자열로 변환
+    /// Convert to hex string
     std::string toHex() const;
 
-    /// DOS 16색 팔레트 인덱스에서 Color 변환
+    /// Convert from DOS 16-color palette index
     static constexpr Color fromDosIndex(int index);
 };
 
 // DOS 16-color palette (True Color values)
 namespace Colors
 {
-/// 검정색
 inline constexpr Color BLACK { 0x00, 0x00, 0x00 };
-
-/// 파란색
 inline constexpr Color BLUE { 0x00, 0x00, 0xAA };
-
-/// 초록색
 inline constexpr Color GREEN { 0x00, 0xAA, 0x00 };
-
-/// 청록색
 inline constexpr Color CYAN { 0x00, 0xAA, 0xAA };
-
-/// 빨간색
 inline constexpr Color RED { 0xAA, 0x00, 0x00 };
-
-/// 자홍색
 inline constexpr Color MAGENTA { 0xAA, 0x00, 0xAA };
-
-/// 갈색
 inline constexpr Color BROWN { 0xAA, 0x55, 0x00 };
-
-/// 밝은 회색
 inline constexpr Color LIGHT_GRAY { 0xAA, 0xAA, 0xAA };
-
-/// 어두운 회색
 inline constexpr Color DARK_GRAY { 0x55, 0x55, 0x55 };
-
-/// 밝은 파란색
 inline constexpr Color LIGHT_BLUE { 0x55, 0x55, 0xFF };
-
-/// 밝은 초록색
 inline constexpr Color LIGHT_GREEN { 0x55, 0xFF, 0x55 };
-
-/// 밝은 청록색
 inline constexpr Color LIGHT_CYAN { 0x55, 0xFF, 0xFF };
-
-/// 밝은 빨간색
 inline constexpr Color LIGHT_RED { 0xFF, 0x55, 0x55 };
-
-/// 밝은 자홍색
 inline constexpr Color LIGHT_MAGENTA { 0xFF, 0x55, 0xFF };
-
-/// 노란색
 inline constexpr Color YELLOW { 0xFF, 0xFF, 0x55 };
-
-/// 흰색
 inline constexpr Color WHITE { 0xFF, 0xFF, 0xFF };
 }
 
@@ -132,7 +101,7 @@ constexpr Color lerpColor(Color a, Color b, float t)
 
 namespace Palette
 {
-/// CGA 16색 팔레트 배열
+/// CGA 16-color palette array
 inline constexpr Color CGA_16[16] = {
     Colors::BLACK, Colors::BLUE, Colors::GREEN, Colors::CYAN,
     Colors::RED, Colors::MAGENTA, Colors::BROWN, Colors::LIGHT_GRAY,
@@ -140,7 +109,7 @@ inline constexpr Color CGA_16[16] = {
     Colors::LIGHT_RED, Colors::LIGHT_MAGENTA, Colors::YELLOW, Colors::WHITE
 };
 
-/// xterm 256색 팔레트에서 Color 변환
+/// Convert from xterm 256-color palette index
 constexpr Color xterm256(uint8_t index)
 {
     if (index < 16)
@@ -158,17 +127,17 @@ constexpr Color xterm256(uint8_t index)
 }
 } // namespace Palette
 
-/// 텍스트 속성 비트 플래그
+/// Text attribute bit flags
 enum class Attr : uint8_t
 {
-    None      = 0,      ///< 속성 없음
-    Bold      = 1 << 0, ///< 굵게
-    Dim       = 1 << 1, ///< 흐리게
-    Italic    = 1 << 2, ///< 기울임
-    Underline = 1 << 3, ///< 밑줄
-    Blink     = 1 << 4, ///< 깜빡임
-    Reverse   = 1 << 5, ///< 반전
-    Strike    = 1 << 6, ///< 취소선
+    None      = 0,      ///< No attributes
+    Bold      = 1 << 0, ///< Bold
+    Dim       = 1 << 1, ///< Dim
+    Italic    = 1 << 2, ///< Italic
+    Underline = 1 << 3, ///< Underline
+    Blink     = 1 << 4, ///< Blink
+    Reverse   = 1 << 5, ///< Reverse
+    Strike    = 1 << 6, ///< Strikethrough
 };
 
 constexpr Attr operator|(Attr a, Attr b)
@@ -186,28 +155,28 @@ constexpr bool hasAttr(Attr attrs, Attr flag)
     return (static_cast<uint8_t>(attrs) & static_cast<uint8_t>(flag)) != 0;
 }
 
-/// 셀의 전경색, 배경색, 텍스트 속성을 포함하는 스타일
+/// Style containing foreground color, background color, and text attributes
 struct Style
 {
-    Color fg = Colors::LIGHT_GRAY; ///< 전경색 (글자 색상)
-    Color bg = Colors::BLACK;      ///< 배경색
-    Attr attr = Attr::None;        ///< 텍스트 속성 (굵게, 기울임 등)
+    Color fg = Colors::LIGHT_GRAY; ///< Foreground (text) color
+    Color bg = Colors::BLACK;      ///< Background color
+    Attr attr = Attr::None;        ///< Text attributes (bold, italic, etc.)
 
-    /// 기본 생성자 (밝은 회색 전경, 검정 배경)
+    /// Default constructor (light gray foreground, black background)
     constexpr Style() = default;
 
-    /// 전경색, 배경색, 속성으로 Style 생성
+    /// Construct Style from foreground, background, and attributes
     constexpr Style(Color foreground, Color background, Attr attributes = Attr::None)
         : fg(foreground), bg(background), attr(attributes)
     {}
 
-    /// 두 스타일이 같은지 비교
+    /// Check equality of two styles
     constexpr bool operator==(Style const & other) const
     {
         return fg == other.fg && bg == other.bg && attr == other.attr;
     }
 
-    /// 두 스타일이 다른지 비교
+    /// Check inequality of two styles
     constexpr bool operator!=(Style const & other) const
     {
         return !(*this == other);

@@ -10,133 +10,133 @@
 
 namespace ventty
 {
-/// 메뉴 항목
+/// Menu item
 struct MenuItem
 {
-    std::string label;                       ///< 항목 라벨
-    std::string shortcut;                    ///< 단축키 표시 텍스트
-    KeyEvent::Key key = KeyEvent::Key::None; ///< 연결된 키
-    bool separator = false;                  ///< 구분선 여부
-    bool enabled = true;                     ///< 활성화 여부
-    std::function<void()> action;            ///< 선택 시 실행할 동작
+    std::string label;                       ///< Item label
+    std::string shortcut;                    ///< Shortcut display text
+    KeyEvent::Key key = KeyEvent::Key::None; ///< Associated key
+    bool separator = false;                  ///< Whether this is a separator
+    bool enabled = true;                     ///< Whether enabled
+    std::function<void()> action;            ///< Action to execute on selection
 
-    /// 구분선 항목 생성
+    /// Create a separator item
     static MenuItem makeSeparator();
 };
 
-/// 팝업 메뉴 위젯
+/// Popup menu widget
 class Menu : public Widget
 {
 public:
-    /// 생성자
+    /// Constructor
     Menu();
 
-    /// 메뉴 항목 추가
+    /// Add a menu item
     void addItem(MenuItem item);
 
-    /// 구분선 추가
+    /// Add a separator
     void addSeparator();
 
-    /// 모든 항목 제거
+    /// Remove all items
     void clear();
 
-    /// 항목 목록 반환
+    /// Return the list of items
     std::vector<MenuItem> const & items() const;
 
-    /// 선택된 항목 인덱스 반환
+    /// Return the selected item index
     int selectedIndex() const;
 
-    /// 선택 인덱스 설정
+    /// Set the selected index
     void setSelectedIndex(int idx);
 
-    /// 지정 위치에 메뉴 표시
+    /// Show the menu at the specified position
     void show(int x, int y);
 
-    /// 메뉴 숨기기
+    /// Hide the menu
     void hide() override;
 
-    /// 메뉴가 열려 있는지 확인
+    /// Check whether the menu is open
     bool isOpen() const;
 
-    /// 선택된 항목 실행
+    /// Execute the selected item
     bool execute();
 
-    /// 메뉴를 윈도우에 그리기
+    /// Draw the menu to a window
     void draw(Window & window) override;
 
-    /// 키 이벤트 처리
+    /// Handle a key event
     bool handleKey(KeyEvent const & event) override;
 
-    /// 내용에 맞게 크기 자동 조정
+    /// Auto-size to fit content
     void autoSize();
 
 private:
-    /// 선택을 위로 이동
+    /// Move selection up
     void moveSelectionUp();
 
-    /// 선택을 아래로 이동
+    /// Move selection down
     void moveSelectionDown();
 
-    /// 다음 선택 가능한 항목 인덱스 반환
+    /// Return the next selectable item index
     int nextSelectableItem(int from, int direction);
 
-    std::vector<MenuItem> _items; ///< 메뉴 항목 목록
-    int _selectedIndex = 0;       ///< 선택된 항목 인덱스
-    bool _open = false;           ///< 메뉴 열림 여부
+    std::vector<MenuItem> _items; ///< List of menu items
+    int _selectedIndex = 0;       ///< Selected item index
+    bool _open = false;           ///< Whether the menu is open
 };
 
-/// 메뉴바 항목
+/// Menu bar entry
 struct MenuBarEntry
 {
-    std::string label;          ///< 메뉴바에 표시할 라벨
-    char hotkey = 0;            ///< Alt+키 단축키 (0이면 없음)
-    std::shared_ptr<Menu> menu; ///< 연결된 메뉴
+    std::string label;          ///< Label displayed on the menu bar
+    char hotkey = 0;            ///< Alt+key shortcut (0 if none)
+    std::shared_ptr<Menu> menu; ///< Associated menu
 };
 
-/// 화면 상단 메뉴바 위젯
+/// Top-of-screen menu bar widget
 class MenuBar : public Widget
 {
 public:
-    /// 생성자
+    /// Constructor
     MenuBar();
 
-    /// 메뉴 추가 (라벨과 메뉴 지정)
+    /// Add a menu with the given label
     void addMenu(std::string label, std::shared_ptr<Menu> menu);
 
-    /// 모든 항목 제거
+    /// Remove all entries
     void clear();
 
-    /// 메뉴바 항목 목록 반환
+    /// Return the list of menu bar entries
     std::vector<MenuBarEntry> const & entries() const;
 
-    /// 선택된 항목 인덱스 반환
+    /// Return the selected entry index
     int selectedIndex() const;
 
-    /// 선택 인덱스 설정
+    /// Set the selected index
     void setSelectedIndex(int idx);
 
-    /// 메뉴바 활성화
+    /// Activate the menu bar
     void activate();
 
-    /// 메뉴바 비활성화
+    /// Deactivate the menu bar
     void deactivate();
 
-    /// 활성화 여부 확인
+    /// Check whether the menu bar is active
     bool isActive() const;
 
-    /// 현재 선택된 메뉴 반환
+    /// Return the currently selected menu
     Menu * currentMenu();
 
-    /// 메뉴바를 윈도우에 그리기
+    /// Draw the menu bar to a window
     void draw(Window & window) override;
 
-    /// 키 이벤트 처리
+    /// Handle a key event
     bool handleKey(KeyEvent const & event) override;
 
 private:
-    std::vector<MenuBarEntry> _entries; ///< 메뉴바 항목 목록
-    int _selectedIndex = 0;             ///< 선택된 항목 인덱스
-    bool _active = false;               ///< 활성화 여부
+    std::vector<MenuBarEntry> _entries; ///< List of menu bar entries
+    int _selectedIndex = 0;             ///< Selected entry index
+    bool _active = false;               ///< Whether active
 };
 } // namespace ventty
 

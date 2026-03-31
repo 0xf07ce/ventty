@@ -12,25 +12,25 @@ namespace ventty
 class Renderer
 {
 public:
-    /// 기본 생성자
+    /// Default constructor
     Renderer() = default;
 
-    /// 소멸자
+    /// Destructor
     ~Renderer() = default;
 
-    /// 화면 내용을 stdout으로 렌더링 (diff 기반)
+    /// Render screen contents to stdout (diff-based)
     void render(Window const & window);
 
-    /// 다음 render()에서 전체 다시 그리기 강제
+    /// Force a full redraw on the next render() call
     void invalidate();
 
 private:
-    /// ANSI 색상 이스케이프 시퀀스를 버퍼에 추가
+    /// Append ANSI color escape sequences to the buffer
     void appendAnsiColor(std::string & buf, Style const & style, Style const & prevStyle);
 
-    std::vector<Cell> _prev; ///< 이전 프레임 버퍼
-    int _prevWidth = 0;      ///< 이전 프레임 너비
-    int _prevHeight = 0;     ///< 이전 프레임 높이
-    bool _fullRedraw = true; ///< 전체 다시 그리기 플래그
+    std::vector<Cell> _prev; ///< Previous frame buffer
+    int _prevWidth = 0;      ///< Previous frame width
+    int _prevHeight = 0;     ///< Previous frame height
+    bool _fullRedraw = true; ///< Full redraw flag
 };
 } // namespace ventty

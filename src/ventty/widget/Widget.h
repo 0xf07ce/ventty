@@ -8,7 +8,7 @@
 
 namespace ventty
 {
-/// 위젯 기본 클래스
+/// Base widget class
 class Widget
 {
 public:
@@ -18,69 +18,69 @@ public:
 
     // Geometry
 
-    /// 위젯 영역 반환
+    /// Return the widget rect
     Rect const & rect() const;
 
-    /// Rect로 위젯 영역 설정
+    /// Set the widget rect from a Rect
     void setRect(Rect const & r);
 
-    /// 좌표와 크기로 위젯 영역 설정
+    /// Set the widget rect from position and size
     void setRect(int x, int y, int w, int h);
 
-    /// X 좌표 반환
+    /// Return the X coordinate
     int x() const;
 
-    /// Y 좌표 반환
+    /// Return the Y coordinate
     int y() const;
 
-    /// 너비 반환
+    /// Return the width
     int width() const;
 
-    /// 높이 반환
+    /// Return the height
     int height() const;
 
     // Visibility
 
-    /// 표시 여부 반환
+    /// Return whether the widget is visible
     bool isVisible() const;
 
-    /// 표시 여부 설정
+    /// Set visibility
     void setVisible(bool v);
 
-    /// 위젯 표시
+    /// Show the widget
     void show();
 
-    /// 위젯 숨기기
+    /// Hide the widget
     virtual void hide();
 
     // Focus
 
-    /// 포커스 여부 반환
+    /// Return whether the widget is focused
     bool isFocused() const;
 
-    /// 포커스 설정
+    /// Set focus state
     void setFocused(bool f);
 
     // Rendering
 
-    /// 위젯을 윈도우에 그리기 (순수 가상 함수)
+    /// Draw the widget to a window (pure virtual)
     virtual void draw(Window & window) = 0;
 
     // Input handling
 
-    /// 키 이벤트 처리 (처리했으면 true 반환)
+    /// Handle a key event (return true if handled)
     virtual bool handleKey(KeyEvent const & event);
 
 protected:
-    /// 크기 변경 시 호출되는 콜백
+    /// Callback invoked on resize
     virtual void onResize();
 
-    /// 포커스 변경 시 호출되는 콜백
+    /// Callback invoked on focus change
     virtual void onFocusChanged();
 
-    Rect _rect;            ///< 위젯 영역
-    bool _visible = true;  ///< 표시 여부
-    bool _focused = false; ///< 포커스 여부
+    Rect _rect;            ///< Widget rect
+    bool _visible = true;  ///< Visibility flag
+    bool _focused = false; ///< Focus flag
 };
 } // namespace ventty
 

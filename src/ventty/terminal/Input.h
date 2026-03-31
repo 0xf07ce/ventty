@@ -12,31 +12,31 @@ namespace ventty
 class Input
 {
 public:
-    /// 생성자
+    /// Constructor
     Input();
 
-    /// 소멸자
+    /// Destructor
     ~Input();
 
-    /// 키 이벤트 읽기 (타임아웃 시 Key::None 반환, -1은 무한 대기)
+    /// Read a key event (returns Key::None on timeout, -1 waits indefinitely)
     KeyEvent read(int timeoutMs = -1);
 
-    /// 입력 가능 여부 확인
+    /// Check whether input is available
     bool poll(int timeoutMs = 0);
 
 private:
-    /// 바이트 한 개 읽기 (타임아웃 지원)
+    /// Read a single byte (with timeout support)
     int readByte(int timeoutMs);
 
-    /// ESC 시퀀스 파싱
+    /// Parse an ESC sequence
     KeyEvent parseEscapeSequence();
 
-    /// CSI 시퀀스 파싱
+    /// Parse a CSI sequence
     KeyEvent parseCsiSequence();
 
-    /// SS3 시퀀스 파싱
+    /// Parse an SS3 sequence
     KeyEvent parseSs3Sequence();
 
-    static constexpr int ESC_TIMEOUT_MS = 50; ///< ESC 키 타임아웃 (밀리초)
+    static constexpr int ESC_TIMEOUT_MS = 50; ///< ESC key timeout (milliseconds)
 };
 } // namespace ventty

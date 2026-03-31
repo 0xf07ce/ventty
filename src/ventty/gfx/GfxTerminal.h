@@ -16,141 +16,141 @@ namespace ventty
 class GfxTerminal : public TerminalBase
 {
 public:
-    /// 생성자
+    /// Constructor
     GfxTerminal();
 
-    /// 소멸자
+    /// Destructor
     ~GfxTerminal() override;
 
-    /// SDL3 윈도우, 렌더러 초기화
+    /// Initialize SDL3 window and renderer
     bool init(int cols, int rows, std::string const & title, int scale = 0);
 
-    /// 아틀라스 폰트 로드 (다중 호출로 다중 아틀라스 지원)
+    /// Load atlas font (multiple calls supported for multiple atlases)
     bool loadFont(std::string const & pngPath, std::string const & fntPath);
 
-    /// 내장 폰트(CP437 + 한글) 로드
+    /// Load built-in font (CP437 + Hangul)
     bool loadBuiltinFont();
 
-    /// 종료 및 리소스 해제
+    /// Shut down and release resources
     void shutdown() override;
 
-    /// 이벤트 폴링
+    /// Poll events
     bool pollEvent() override;
 
-    /// 화면 렌더링
+    /// Render screen
     void render() override;
 
-    /// 전체 화면 강제 다시 그리기
+    /// Force full screen redraw
     void forceRedraw() override;
 
     // -- drawing on root screen --
 
-    /// 기본 스타일로 루트 화면 지우기
+    /// Clear root screen with default style
     void clear() override;
 
-    /// 지정한 배경색으로 루트 화면 지우기
+    /// Clear root screen with specified background color
     void clear(Color bg) override;
 
-    /// 기본 스타일로 문자 출력
+    /// Put character with default style
     void putChar(int x, int y, char32_t cp) override;
 
-    /// 스타일 적용하여 문자 출력
+    /// Put character with style
     void putChar(int x, int y, char32_t cp, Style const & style) override;
 
-    /// 전경/배경/속성으로 문자 출력
+    /// Put character with foreground, background, and attributes
     void putChar(int x, int y, char32_t cp, Color fg, Color bg, Attr attr = Attr::None) override;
 
-    /// 기본 스타일로 텍스트 출력
+    /// Draw text with default style
     void drawText(int x, int y, std::string_view text) override;
 
-    /// 스타일 적용하여 텍스트 출력
+    /// Draw text with style
     void drawText(int x, int y, std::string_view text, Style const & style) override;
 
-    /// 전경/배경/속성으로 텍스트 출력
+    /// Draw text with foreground, background, and attributes
     void drawText(int x, int y, std::string_view text, Color fg, Color bg, Attr attr = Attr::None) override;
 
-    /// 전경/배경으로 영역 채우기
+    /// Fill region with foreground and background
     void fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg) override;
 
-    /// 스타일 적용하여 영역 채우기
+    /// Fill region with style
     void fill(int x, int y, int w, int h, char32_t cp, Style const & style) override;
 
-    /// 기본 스타일 설정
+    /// Set default style
     void setDefaultStyle(Style const & style) override;
 
     // -- window management --
 
-    /// 윈도우 생성
+    /// Create a window
     Window * createWindow(int x, int y, int w, int h) override;
 
-    /// 윈도우 제거
+    /// Destroy a window
     void destroyWindow(Window * win) override;
 
     // -- queries --
 
-    /// 터미널 열 수 반환
+    /// Return number of terminal columns
     int cols() const override;
 
-    /// 터미널 행 수 반환
+    /// Return number of terminal rows
     int rows() const override;
 
-    /// 셀 너비 (픽셀) 반환
+    /// Return cell width (pixels)
     int cellWidth() const;
 
-    /// 셀 높이 (픽셀) 반환
+    /// Return cell height (pixels)
     int cellHeight() const;
 
     // -- callbacks --
 
-    /// 키 이벤트 콜백 등록
+    /// Register key event callback
     void onKey(KeyCallback cb) override;
 
-    /// 마우스 이벤트 콜백 등록
+    /// Register mouse event callback
     void onMouse(MouseCallback cb) override;
 
-    /// 크기 변경 이벤트 콜백 등록
+    /// Register resize event callback
     void onResize(ResizeCallback cb) override;
 
-    /// 텍스트 입력(IME 확정) 콜백 등록
+    /// Register text input (IME committed) callback
     void onTextInput(TextInputCallback cb);
 
-    /// 텍스트 편집(IME 조합) 콜백 등록
+    /// Register text editing (IME composing) callback
     void onTextEditing(TextEditingCallback cb);
 
     // -- IME --
 
-    /// 텍스트 입력(IME) 시작
+    /// Start text input (IME)
     void startTextInput();
 
-    /// 텍스트 입력(IME) 중지
+    /// Stop text input (IME)
     void stopTextInput();
 
     // -- direct cell access --
 
-    /// 지정 좌표의 셀 참조 반환
+    /// Return cell reference at specified coordinates
     Cell & cellAt(int x, int y) override;
 
-    /// 지정 좌표의 셀 상수 참조 반환
+    /// Return const cell reference at specified coordinates
     Cell const & cellAt(int x, int y) const override;
 
-    /// 실행 파일 기본 경로 반환 (SDL_GetBasePath 래퍼)
+    /// Return executable base path (SDL_GetBasePath wrapper)
     static std::string basePath();
 
 private:
-    int _cols = 80; ///< 터미널 열 수
-    int _rows = 25; ///< 터미널 행 수
+    int _cols = 80; ///< Number of terminal columns
+    int _rows = 25; ///< Number of terminal rows
 
-    Style _defaultStyle; ///< 기본 스타일
+    Style _defaultStyle; ///< Default style
 
-    GfxFont _font;         ///< 비트맵 아틀라스 폰트
-    GfxRenderer _renderer; ///< SDL 렌더러
-    GfxInput _input;       ///< 입력 처리기
+    GfxFont _font;         ///< Bitmap atlas font
+    GfxRenderer _renderer; ///< SDL renderer
+    GfxInput _input;       ///< Input handler
 
-    bool _fontLoaded = false; ///< 폰트 로드 여부
+    bool _fontLoaded = false; ///< Whether font is loaded
 
-    std::unique_ptr<Window> _rootScreen;           ///< 루트 화면 윈도우
-    std::vector<std::unique_ptr<Window>> _windows; ///< 관리 중인 윈도우 목록
+    std::unique_ptr<Window> _rootScreen;           ///< Root screen window
+    std::vector<std::unique_ptr<Window>> _windows; ///< Managed window list
 
-    ResizeCallback _resizeCb; ///< 크기 변경 콜백
+    ResizeCallback _resizeCb; ///< Resize callback
 };
 } // namespace ventty

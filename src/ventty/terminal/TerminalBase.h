@@ -13,77 +13,77 @@ class Window;
 /// Key event from terminal input
 struct KeyEvent
 {
-    /// 키 종류
+    /// Key type
     enum class Key : int
     {
-        None = 0,  ///< 없음
-        Up,        ///< 위쪽 화살표
-        Down,      ///< 아래쪽 화살표
-        Left,      ///< 왼쪽 화살표
-        Right,     ///< 오른쪽 화살표
-        Home,      ///< Home 키
-        End,       ///< End 키
-        PageUp,    ///< Page Up 키
-        PageDown,  ///< Page Down 키
-        Insert,    ///< Insert 키
-        Delete,    ///< Delete 키
-        Backspace, ///< Backspace 키
-        Tab,       ///< Tab 키
-        Enter,     ///< Enter 키
-        Escape,    ///< Escape 키
+        None = 0,  ///< No key
+        Up,        ///< Up arrow
+        Down,      ///< Down arrow
+        Left,      ///< Left arrow
+        Right,     ///< Right arrow
+        Home,      ///< Home key
+        End,       ///< End key
+        PageUp,    ///< Page Up key
+        PageDown,  ///< Page Down key
+        Insert,    ///< Insert key
+        Delete,    ///< Delete key
+        Backspace, ///< Backspace key
+        Tab,       ///< Tab key
+        Enter,     ///< Enter key
+        Escape,    ///< Escape key
         F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-        Char,      ///< 일반 문자 — `ch` 참조
+        Char,      ///< Printable character — see `ch`
     };
 
-    Key key = Key::None; ///< 눌린 키 종류
-    char32_t ch = 0;     ///< 유니코드 코드포인트 (key == Key::Char일 때)
-    bool shift = false;  ///< Shift 키 눌림 여부
-    bool ctrl = false;   ///< Ctrl 키 눌림 여부
-    bool alt = false;    ///< Alt 키 눌림 여부
+    Key key = Key::None; ///< Key type pressed
+    char32_t ch = 0;     ///< Unicode code point (when key == Key::Char)
+    bool shift = false;  ///< Whether Shift is held
+    bool ctrl = false;   ///< Whether Ctrl is held
+    bool alt = false;    ///< Whether Alt is held
 };
 
 /// Mouse button event
 struct MouseEvent
 {
-    /// 마우스 버튼 종류
+    /// Mouse button type
     enum class Button : uint8_t
     {
-        None = 0,   ///< 없음
-        Left,       ///< 왼쪽 버튼
-        Middle,     ///< 가운데 버튼
-        Right,      ///< 오른쪽 버튼
-        ScrollUp,   ///< 스크롤 위로
-        ScrollDown, ///< 스크롤 아래로
+        None = 0,   ///< No button
+        Left,       ///< Left button
+        Middle,     ///< Middle button
+        Right,      ///< Right button
+        ScrollUp,   ///< Scroll up
+        ScrollDown, ///< Scroll down
     };
 
-    /// 마우스 동작 종류
+    /// Mouse action type
     enum class Action : uint8_t
     {
-        Press,   ///< 누르기
-        Release, ///< 놓기
-        Move,    ///< 이동
+        Press,   ///< Press
+        Release, ///< Release
+        Move,    ///< Move
     };
 
-    Button button = Button::None;  ///< 눌린 마우스 버튼
-    Action action = Action::Press; ///< 마우스 동작
-    int x = 0;                     ///< 열 좌표 (0 기반)
-    int y = 0;                     ///< 행 좌표 (0 기반)
+    Button button = Button::None;  ///< Mouse button pressed
+    Action action = Action::Press; ///< Mouse action
+    int x = 0;                     ///< Column coordinate (0-based)
+    int y = 0;                     ///< Row coordinate (0-based)
 };
 
 /// Terminal resize event
 struct ResizeEvent
 {
-    int cols = 0; ///< 변경된 열 수
-    int rows = 0; ///< 변경된 행 수
+    int cols = 0; ///< New column count
+    int rows = 0; ///< New row count
 };
 
-/// 키 이벤트 콜백 타입
+/// Key event callback type
 using KeyCallback = std::function<void(KeyEvent const &)>;
 
-/// 마우스 이벤트 콜백 타입
+/// Mouse event callback type
 using MouseCallback = std::function<void(MouseEvent const &)>;
 
-/// 크기 변경 이벤트 콜백 타입
+/// Resize event callback type
 using ResizeCallback = std::function<void(ResizeEvent const &)>;
 
 /// Abstract terminal interface — backend-agnostic.
@@ -98,96 +98,96 @@ public:
 
     // -- lifecycle --
 
-    /// 터미널 종료 및 리소스 해제
+    /// Shut down the terminal and release resources
     virtual void shutdown() = 0;
 
-    /// 이벤트 폴링 (이벤트가 있으면 true 반환)
+    /// Poll for events (returns true if an event was processed)
     virtual bool pollEvent() = 0;
 
-    /// 화면 렌더링
+    /// Render the screen
     virtual void render() = 0;
 
-    /// 전체 화면 강제 다시 그리기
+    /// Force a full screen redraw
     virtual void forceRedraw() = 0;
 
     // -- drawing on root screen --
 
-    /// 기본 스타일로 루트 화면 지우기
+    /// Clear the root screen with default style
     virtual void clear() = 0;
 
-    /// 지정한 배경색으로 루트 화면 지우기
+    /// Clear the root screen with the specified background color
     virtual void clear(Color bg) = 0;
 
-    /// 기본 스타일로 문자 출력
+    /// Put a character with default style
     virtual void putChar(int x, int y, char32_t cp) = 0;
 
-    /// 스타일 적용하여 문자 출력
+    /// Put a character with the given style
     virtual void putChar(int x, int y, char32_t cp, Style const & style) = 0;
 
-    /// 전경/배경/속성으로 문자 출력
+    /// Put a character with foreground, background, and attributes
     virtual void putChar(int x, int y, char32_t cp, Color fg, Color bg, Attr attr = Attr::None) = 0;
 
-    /// 기본 스타일로 텍스트 출력
+    /// Draw text with default style
     virtual void drawText(int x, int y, std::string_view text) = 0;
 
-    /// 스타일 적용하여 텍스트 출력
+    /// Draw text with the given style
     virtual void drawText(int x, int y, std::string_view text, Style const & style) = 0;
 
-    /// 전경/배경/속성으로 텍스트 출력
+    /// Draw text with foreground, background, and attributes
     virtual void drawText(int x, int y, std::string_view text, Color fg, Color bg, Attr attr = Attr::None) = 0;
 
-    /// 전경/배경으로 영역 채우기
+    /// Fill a region with foreground and background colors
     virtual void fill(int x, int y, int w, int h, char32_t cp, Color fg, Color bg) = 0;
 
-    /// 스타일 적용하여 영역 채우기
+    /// Fill a region with the given style
     virtual void fill(int x, int y, int w, int h, char32_t cp, Style const & style) = 0;
 
-    /// 기본 스타일 설정
+    /// Set the default style
     virtual void setDefaultStyle(Style const & style) = 0;
 
     // -- window management --
 
-    /// 윈도우 생성 (위치와 크기 지정)
+    /// Create a window at the given position and size
     virtual Window * createWindow(int x, int y, int w, int h) = 0;
 
-    /// 윈도우 제거
+    /// Destroy a window
     virtual void destroyWindow(Window * win) = 0;
 
     // -- queries --
 
-    /// 터미널 열 수 반환
+    /// Return the number of terminal columns
     virtual int cols() const = 0;
 
-    /// 터미널 행 수 반환
+    /// Return the number of terminal rows
     virtual int rows() const = 0;
 
-    /// 실행 중인지 확인
+    /// Check whether the terminal is running
     bool isRunning() const { return _running; }
 
-    /// 종료 요청
+    /// Request termination
     void quit() { _running = false; }
 
     // -- callbacks --
 
-    /// 키 이벤트 콜백 등록
+    /// Register a key event callback
     virtual void onKey(KeyCallback cb) = 0;
 
-    /// 마우스 이벤트 콜백 등록
+    /// Register a mouse event callback
     virtual void onMouse(MouseCallback cb) = 0;
 
-    /// 크기 변경 이벤트 콜백 등록
+    /// Register a resize event callback
     virtual void onResize(ResizeCallback cb) = 0;
 
     // -- direct cell access --
 
-    /// 지정 좌표의 셀 참조 반환
+    /// Return a mutable reference to the cell at the given coordinates
     virtual Cell & cellAt(int x, int y) = 0;
 
-    /// 지정 좌표의 셀 상수 참조 반환
+    /// Return a const reference to the cell at the given coordinates
     virtual Cell const & cellAt(int x, int y) const = 0;
 
 protected:
     TerminalBase() = default;
-    bool _running = false; ///< 실행 상태 플래그
+    bool _running = false; ///< Running state flag
 };
 } // namespace ventty

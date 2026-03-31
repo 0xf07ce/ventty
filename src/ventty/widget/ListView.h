@@ -9,15 +9,15 @@
 
 namespace ventty
 {
-/// 리스트뷰의 항목
+/// List view item
 struct ListItem
 {
-    std::string text;          ///< 항목 텍스트
-    Style style;               ///< 항목 스타일
-    void * userData = nullptr; ///< 사용자 데이터 포인터
+    std::string text;          ///< Item text
+    Style style;               ///< Item style
+    void * userData = nullptr; ///< User data pointer
 };
 
-/// 스크롤 가능한 항목 목록 위젯
+/// Scrollable item list widget
 class ListView : public Widget
 {
 public:
@@ -25,97 +25,97 @@ public:
 
     // Items
 
-    /// 모든 항목 제거
+    /// Remove all items
     void clear();
 
-    /// 항목 추가
+    /// Add an item
     void addItem(ListItem item);
 
-    /// 항목 목록 일괄 설정
+    /// Set all items at once
     void setItems(std::vector<ListItem> items);
 
-    /// 항목 목록 반환
+    /// Return the item list
     std::vector<ListItem> const & items() const;
 
-    /// 항목 수 반환
+    /// Return the item count
     size_t itemCount() const;
 
     // Selection
 
-    /// 선택된 항목 인덱스 반환
+    /// Return the selected item index
     int selectedIndex() const;
 
-    /// 선택 인덱스 설정
+    /// Set the selected index
     void setSelectedIndex(int index);
 
-    /// 선택된 항목 포인터 반환 (없으면 nullptr)
+    /// Return the selected item pointer (nullptr if none)
     ListItem const * selectedItem() const;
 
     // Scrolling
 
-    /// 스크롤 오프셋 반환
+    /// Return the scroll offset
     int scrollOffset() const;
 
-    /// 스크롤 오프셋 설정
+    /// Set the scroll offset
     void setScrollOffset(int offset);
 
-    /// 선택된 항목이 보이도록 스크롤
+    /// Scroll to make the selected item visible
     void scrollToSelected();
 
     // Style
 
-    /// 일반 항목 스타일 반환
+    /// Return the normal item style
     Style const & normalStyle() const;
 
-    /// 일반 항목 스타일 설정
+    /// Set the normal item style
     void setNormalStyle(Style const & s);
 
-    /// 선택 항목 스타일 반환
+    /// Return the selected item style
     Style const & selectedStyle() const;
 
-    /// 선택 항목 스타일 설정
+    /// Set the selected item style
     void setSelectedStyle(Style const & s);
 
     // Callbacks
 
-    /// 선택 변경 콜백 타입
+    /// Selection change callback type
     using SelectionCallback = std::function<void(int index)>;
 
-    /// 항목 활성화(Enter) 콜백 타입
+    /// Item activation (Enter) callback type
     using ActivateCallback = std::function<void(int index)>;
 
-    /// 선택 변경 콜백 설정
+    /// Set the selection change callback
     void setOnSelectionChanged(SelectionCallback cb);
 
-    /// 항목 활성화 콜백 설정
+    /// Set the item activation callback
     void setOnActivate(ActivateCallback cb);
 
     // Widget interface
 
-    /// 리스트뷰를 윈도우에 그리기
+    /// Draw the list view to the window
     void draw(Window & window) override;
 
-    /// 키 이벤트 처리
+    /// Handle key event
     bool handleKey(KeyEvent const & event) override;
 
 protected:
-    /// 크기 변경 시 호출
+    /// Called on resize
     void onResize() override;
 
 private:
-    /// 지정 인덱스가 보이도록 스크롤 조정
+    /// Adjust scroll to make the given index visible
     void ensureVisible(int index);
 
-    /// 화면에 표시 가능한 항목 수 반환
+    /// Return the number of items visible on screen
     int visibleItemCount() const;
 
-    std::vector<ListItem> _items;                             ///< 항목 목록
-    int _selectedIndex = 0;                                   ///< 현재 선택 인덱스
-    int _scrollOffset = 0;                                    ///< 스크롤 오프셋
-    Style _normalStyle { Colors::LIGHT_GRAY, Colors::BLACK }; ///< 일반 항목 스타일
-    Style _selectedStyle { Colors::WHITE, Colors::RED };      ///< 선택 항목 스타일
-    SelectionCallback _onSelectionChanged;                    ///< 선택 변경 콜백
-    ActivateCallback _onActivate;                             ///< 항목 활성화 콜백
+    std::vector<ListItem> _items;                             ///< Item list
+    int _selectedIndex = 0;                                   ///< Current selected index
+    int _scrollOffset = 0;                                    ///< Scroll offset
+    Style _normalStyle { Colors::LIGHT_GRAY, Colors::BLACK }; ///< Normal item style
+    Style _selectedStyle { Colors::WHITE, Colors::RED };      ///< Selected item style
+    SelectionCallback _onSelectionChanged;                    ///< Selection change callback
+    ActivateCallback _onActivate;                             ///< Item activation callback
 };
 } // namespace ventty
 

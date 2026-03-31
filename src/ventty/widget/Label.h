@@ -7,48 +7,48 @@
 
 namespace ventty
 {
-/// 텍스트 정렬 방향
+/// Text alignment direction
 enum class Align
 {
-    Left,   ///< 왼쪽 정렬
-    Center, ///< 가운데 정렬
-    Right,  ///< 오른쪽 정렬
+    Left,   ///< Left-aligned
+    Center, ///< Center-aligned
+    Right,  ///< Right-aligned
 };
 
-/// 단순 텍스트 표시 위젯
+/// Simple text display widget
 class Label : public Widget
 {
 public:
     Label() = default;
 
-    /// 텍스트를 지정하여 라벨 생성
+    /// Create a label with the given text
     explicit Label(std::string text);
 
-    /// 텍스트 반환
+    /// Return the text
     std::string const & text() const;
 
-    /// 텍스트 설정
+    /// Set the text
     void setText(std::string text);
 
-    /// 스타일 반환
+    /// Return the style
     Style const & style() const;
 
-    /// 스타일 설정
+    /// Set the style
     void setStyle(Style const & s);
 
-    /// 정렬 방향 반환
+    /// Return the alignment
     Align align() const;
 
-    /// 정렬 방향 설정
+    /// Set the alignment
     void setAlign(Align a);
 
-    /// 라벨을 윈도우에 그리기
+    /// Draw the label to a window
     void draw(Window & window) override;
 
 private:
-    std::string _text;          ///< 표시할 텍스트
-    Style _style;               ///< 라벨 스타일
-    Align _align = Align::Left; ///< 텍스트 정렬 방향
+    std::string _text;          ///< Display text
+    Style _style;               ///< Label style
+    Align _align = Align::Left; ///< Text alignment
 };
 } // namespace ventty
 

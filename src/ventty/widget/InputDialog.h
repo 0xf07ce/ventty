@@ -7,72 +7,72 @@
 
 namespace ventty
 {
-/// 텍스트 입력 대화상자 위젯
+/// Text input dialog widget
 class InputDialog : public Widget
 {
 public:
-    /// 생성자
+    /// Constructor
     InputDialog();
 
-    /// 제목 설정
+    /// Set the title
     void setTitle(std::string title);
 
-    /// 제목 반환
+    /// Return the title
     std::string const & title() const;
 
-    /// 프롬프트 텍스트 설정
+    /// Set the prompt text
     void setPrompt(std::string prompt);
 
-    /// 프롬프트 텍스트 반환
+    /// Return the prompt text
     std::string const & prompt() const;
 
-    /// 입력값 설정
+    /// Set the input value
     void setValue(std::string value);
 
-    /// 입력값 반환
+    /// Return the input value
     std::string const & value() const;
 
-    /// 대화상자 결과 반환
+    /// Return the dialog result
     DialogResult result() const;
 
-    /// 결과값 설정
+    /// Set the result
     void setResult(DialogResult r);
 
-    /// 입력 대화상자를 윈도우에 그리기
+    /// Draw the input dialog to the window
     void draw(Window & window) override;
 
-    /// 키 이벤트 처리
+    /// Handle key event
     bool handleKey(KeyEvent const & event) override;
 
-    /// IME 조합 중인 텍스트 설정
+    /// Set the IME composing text
     void setComposingText(std::string text);
 
-    /// 내용에 맞게 크기 자동 조정
+    /// Auto-resize to fit content
     void autoSize(int screenWidth, int screenHeight);
 
 private:
-    /// 커서 위치에 문자 삽입
+    /// Insert a character at the cursor position
     void insertChar(char32_t ch);
 
-    /// 커서 위치의 문자 삭제
+    /// Delete the character at the cursor position
     void deleteChar();
 
-    /// 커서 앞의 문자 삭제
+    /// Delete the character before the cursor
     void backspace();
 
-    /// 커서를 왼쪽으로 이동
+    /// Move the cursor left
     void moveCursorLeft();
 
-    /// 커서를 오른쪽으로 이동
+    /// Move the cursor right
     void moveCursorRight();
 
-    std::string _title;                        ///< 대화상자 제목
-    std::string _prompt;                       ///< 프롬프트 텍스트
-    std::string _value;                        ///< 현재 입력값
-    std::string _composingText;                ///< IME 조합 중인 텍스트
-    int _cursorPos = 0;                        ///< 커서 위치
-    int _scrollOffset = 0;                     ///< 입력 필드 스크롤 오프셋
-    DialogResult _result = DialogResult::None; ///< 대화상자 결과
+    std::string _title;                        ///< Dialog title
+    std::string _prompt;                       ///< Prompt text
+    std::string _value;                        ///< Current input value
+    std::string _composingText;                ///< IME composing text
+    int _cursorPos = 0;                        ///< Cursor position
+    int _scrollOffset = 0;                     ///< Input field scroll offset
+    DialogResult _result = DialogResult::None; ///< Dialog result
 };
 } // namespace ventty
 

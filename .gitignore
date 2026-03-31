@@ -2,6 +2,7 @@
 .idea/
 .vscode/
 .claude/
+build/
 cmake-build-*/
 AGENTS.md
 CLAUDE.md
