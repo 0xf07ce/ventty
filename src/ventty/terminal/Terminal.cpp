@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <exception>
 
 namespace ventty
 {
@@ -115,8 +116,25 @@ static void emergencyRestore()
     char const RESTORE[] =
         "\033[?25h"
         "\033[0m"
-        "\033[?1049l";
+        "\033[?1049l"
+        "\n";
     ::write(STDOUT_FILENO, RESTORE, sizeof(RESTORE) - 1);
+}
+
+static std::terminate_handler gPrevTerminate = nullptr;
+
+static void terminateHandler()
+{
+    // Restore terminal state before aborting
+    if (gActiveTerminal != nullptr)
+        gActiveTerminal->shutdown();
+    else
+        emergencyRestore();
+
+    if (gPrevTerminate)
+        gPrevTerminate();
+    else
+        std::abort();
 }
 
 static void atexitHandler()
@@ -185,6 +203,7 @@ bool Terminal::init()
 
     gActiveTerminal = this;
     std::atexit(atexitHandler);
+    gPrevTerminate = std::set_terminate(terminateHandler);
 
     struct sigaction sa {};
     sa.sa_handler = signalHandler;
@@ -239,10 +258,20 @@ void Terminal::shutdown()
         _impl->rawMode = false;
     }
 
+    // Ensure cursor is on a fresh line so the shell prompt renders cleanly.
+    ansi::write("\n");
+
     tcflush(STDIN_FILENO, TCIFLUSH);
 
     if (gActiveTerminal == this)
+    {
         gActiveTerminal = nullptr;
+        if (gPrevTerminate)
+        {
+            std::set_terminate(gPrevTerminate);
+            gPrevTerminate = nullptr;
+        }
+    }
 }
 
 void Terminal::querySize()

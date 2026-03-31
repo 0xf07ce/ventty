@@ -9,7 +9,6 @@ option(VENTTY_BUILD_GFX     "Build with Graphics Support"    ON)
 option(VENTTY_BUILD_TESTS   "Build Tests"                    ON)
 
 add_subdirectory(src)
-add_subdirectory(examples)
 
 if (VENTTY_BUILD_TESTS)
     enable_testing()

@@ -137,6 +137,7 @@ def main():
     fonts = [
         {"name": "cp437_8x16", "prefix": "CP437_8X16"},
         {"name": "hangul_16x16", "prefix": "HANGUL_16X16"},
+        {"name": "jamo_16x16", "prefix": "JAMO_16X16"},
     ]
 
     font_infos = []

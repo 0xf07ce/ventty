@@ -63,6 +63,7 @@ if (VENTTY_BUILD_GFX)
         ventty/gfx/fonts/EmbeddedFonts.h
         ventty/gfx/fonts/cp437_8x16.cpp
         ventty/gfx/fonts/hangul_16x16.cpp
+        ventty/gfx/fonts/jamo_16x16.cpp
 
         # umbrella
         ventty/ventty_gfx.h

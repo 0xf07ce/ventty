@@ -235,11 +235,11 @@ int GfxTerminal::cols() const { return _cols; }
 int GfxTerminal::rows() const { return _rows; }
 int GfxTerminal::cellWidth() const { return _font.cellWidth(); }
 int GfxTerminal::cellHeight() const { return _font.cellHeight(); }
-void GfxTerminal::onKey(ventty::KeyCallback cb) { _input.onKey(std::move(cb)); }
+void GfxTerminal::onKey(ventty::KeyCallback cb) { _input.clearKeyCallbacks(); _input.onKey(std::move(cb)); }
 void GfxTerminal::onMouse(ventty::MouseCallback cb) { _input.onMouse(std::move(cb)); }
 void GfxTerminal::onResize(ventty::ResizeCallback cb) { _resizeCb = std::move(cb); }
 void GfxTerminal::onTextInput(TextInputCallback cb) { _input.onTextInput(std::move(cb)); }
-void GfxTerminal::onTextEditing(TextEditingCallback cb) { _input.onTextEditing(std::move(cb)); }
+void GfxTerminal::onTextEditing(TextEditingCallback cb) { _input.clearTextEditingCallbacks(); _input.onTextEditing(std::move(cb)); }
 void GfxTerminal::startTextInput() { _input.startTextInput(); }
 void GfxTerminal::stopTextInput() { _input.stopTextInput(); }
 } // namespace ventty

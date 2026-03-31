@@ -44,6 +44,9 @@ public:
     /// 키 이벤트 처리
     bool handleKey(KeyEvent const & event) override;
 
+    /// IME 조합 중인 텍스트 설정
+    void setComposingText(std::string text);
+
     /// 내용에 맞게 크기 자동 조정
     void autoSize(int screenWidth, int screenHeight);
 
@@ -66,6 +69,7 @@ private:
     std::string _title;                        ///< 대화상자 제목
     std::string _prompt;                       ///< 프롬프트 텍스트
     std::string _value;                        ///< 현재 입력값
+    std::string _composingText;                ///< IME 조합 중인 텍스트
     int _cursorPos = 0;                        ///< 커서 위치
     int _scrollOffset = 0;                     ///< 입력 필드 스크롤 오프셋
     DialogResult _result = DialogResult::None; ///< 대화상자 결과

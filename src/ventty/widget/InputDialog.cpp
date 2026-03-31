@@ -50,6 +50,11 @@ DialogResult InputDialog::result() const
     return _result;
 }
 
+void InputDialog::setComposingText(std::string text)
+{
+    _composingText = std::move(text);
+}
+
 void InputDialog::autoSize(int screenWidth, int screenHeight)
 {
     int width = std::max(40, static_cast<int>(_title.size()) + 4);
@@ -215,13 +220,34 @@ void InputDialog::draw(Window & window)
         window.putChar(inputX + i, inputY, U' ', inputStyle);
     }
 
-    // Draw value
-    std::string displayValue = _value;
+    // Build display string: value before cursor + composing text + value after cursor
+    std::string beforeCursor = _value.substr(0, _cursorPos);
+    std::string afterCursor = _value.substr(_cursorPos);
+    std::string displayValue = beforeCursor + _composingText + afterCursor;
     if (static_cast<int>(displayValue.size()) > inputWidth - 1)
     {
         displayValue = displayValue.substr(0, inputWidth - 1);
     }
     window.drawText(inputX, inputY, displayValue, inputStyle);
+
+    // Draw composing text with underline
+    if (!_composingText.empty())
+    {
+        Style composeStyle { Colors::BLACK, Colors::WHITE, Attr::Underline };
+        int composeX = inputX;
+        for (int i = 0; i < _cursorPos && i < static_cast<int>(_value.size());)
+        {
+            unsigned char c = _value[i];
+            int charLen = 1;
+            int charWidth = 1;
+            if ((c & 0xE0) == 0xC0) { charLen = 2; }
+            else if ((c & 0xF0) == 0xE0) { charLen = 3; charWidth = 2; }
+            else if ((c & 0xF8) == 0xF0) { charLen = 4; charWidth = 2; }
+            composeX += charWidth;
+            i += charLen;
+        }
+        window.drawText(composeX, inputY, _composingText, composeStyle);
+    }
 
     // Draw cursor
     int cursorX = inputX;
@@ -248,6 +274,20 @@ void InputDialog::draw(Window & window)
         cursorX += charWidth;
         i += charLen;
     }
+
+    // Advance cursor past composing text
+    for (size_t i = 0; i < _composingText.size();)
+    {
+        unsigned char c = _composingText[i];
+        int charLen = 1;
+        int charWidth = 1;
+        if ((c & 0xE0) == 0xC0) { charLen = 2; }
+        else if ((c & 0xF0) == 0xE0) { charLen = 3; charWidth = 2; }
+        else if ((c & 0xF8) == 0xF0) { charLen = 4; charWidth = 2; }
+        cursorX += charWidth;
+        i += charLen;
+    }
+
     Style cursorStyle { Colors::WHITE, Colors::BLACK };
     if (_cursorPos < static_cast<int>(_value.size()))
     {
@@ -259,7 +299,7 @@ void InputDialog::draw(Window & window)
         else if ((c & 0xF8) == 0xF0) charLen = 4;
         window.drawText(cursorX, inputY, _value.substr(_cursorPos, charLen), cursorStyle);
     }
-    else
+    else if (_composingText.empty())
     {
         window.putChar(cursorX, inputY, U'_', cursorStyle);
     }

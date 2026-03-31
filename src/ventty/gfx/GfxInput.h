@@ -54,6 +54,12 @@ public:
     /// 키 이벤트 콜백 등록
     void onKey(ventty::KeyCallback cb);
 
+    /// 키 이벤트 콜백 제거
+    void clearKeyCallbacks();
+
+    /// 텍스트 편집 콜백 제거
+    void clearTextEditingCallbacks();
+
     /// 마우스 이벤트 콜백 등록
     void onMouse(ventty::MouseCallback cb);
 

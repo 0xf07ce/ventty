@@ -176,6 +176,19 @@ bool GfxFont::loadBuiltin(SDL_Renderer * renderer)
         fonts::HANGUL_16X16_GLYPH_WIDTH, fonts::HANGUL_16X16_GLYPH_HEIGHT,
         fonts::HANGUL_16X16_ADVANCE, hangulIndex);
 
+    // Hangul Compatibility Jamo (full-width, contiguous range U+3131..U+318E)
+    SDL_Texture * jamo = loadPngFromMemory(renderer, fonts::JAMO_16X16_PNG, fonts::JAMO_16X16_PNG_SIZE);
+    if (!jamo)
+        return false;
+
+    int jamoIndex = static_cast<int>(_textures.size());
+    _textures.push_back(jamo);
+
+    registerGlyphs(fonts::JAMO_16X16_START, fonts::JAMO_16X16_COUNT,
+        fonts::JAMO_16X16_ATLAS_COLS,
+        fonts::JAMO_16X16_GLYPH_WIDTH, fonts::JAMO_16X16_GLYPH_HEIGHT,
+        fonts::JAMO_16X16_ADVANCE, jamoIndex);
+
     return true;
 }
 

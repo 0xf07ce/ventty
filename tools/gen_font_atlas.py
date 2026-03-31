@@ -297,6 +297,9 @@ def resolve_range(range_arg: str) -> list[int]:
     if range_arg == "hangul":
         return list(range(0xAC00, 0xD7B0))  # U+AC00-U+D7AF inclusive (11,172 syllables)
 
+    if range_arg == "jamo":
+        return list(range(0x3131, 0x318F))  # U+3131-U+318E inclusive (94 compatibility jamo)
+
     # Custom range: U+XXXX-U+XXXX
     match = re.fullmatch(r"U\+([0-9A-Fa-f]{4,6})-U\+([0-9A-Fa-f]{4,6})", range_arg)
     if match:
@@ -327,6 +330,8 @@ def default_cols(codepoints: list[int], range_arg: str) -> int:
         return 16
     if range_arg == "hangul":
         return 128  # 11172 / 128 ≈ 88 rows
+    if range_arg == "jamo":
+        return 16   # 94 / 16 = 6 rows
     # Generic: aim for a roughly square-ish atlas capped at a power of two
     cols = 1
     while cols * cols < count:

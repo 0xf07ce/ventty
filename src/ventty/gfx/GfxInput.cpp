@@ -207,6 +207,8 @@ void GfxInput::stopTextInput()
 }
 
 void GfxInput::onKey(ventty::KeyCallback cb) { _keyCallbacks.push_back(std::move(cb)); }
+void GfxInput::clearKeyCallbacks() { _keyCallbacks.clear(); }
+void GfxInput::clearTextEditingCallbacks() { _textEditingCallbacks.clear(); }
 void GfxInput::onMouse(ventty::MouseCallback cb) { _mouseCallbacks.push_back(std::move(cb)); }
 void GfxInput::onTextInput(TextInputCallback cb) { _textInputCallbacks.push_back(std::move(cb)); }
 void GfxInput::onTextEditing(TextEditingCallback cb) { _textEditingCallbacks.push_back(std::move(cb)); }
