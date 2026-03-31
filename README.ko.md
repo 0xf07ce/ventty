@@ -48,12 +48,26 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 
 ## 요구사항
 
-- CMake >= 4.0
+- CMake >= 3.20
 - C++20 컴파일러
 - POSIX 호환 시스템 (Linux, macOS, BSD)
 - SDL3, SDL3_image (그래픽 백엔드용, 선택사항 — 미설치 시 자동 획득)
 
 ## 빌드
+
+### Linux (Ubuntu/Debian)
+
+먼저 의존성을 설치합니다:
+
+```bash
+sudo apt-get install -y \
+  libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+  libxfixes-dev libxss-dev libwayland-dev libxkbcommon-dev \
+  libegl-dev libgl-dev libgles-dev \
+  libasound2-dev libpulse-dev libpipewire-0.3-dev
+```
+
+### 빌드
 
 ```bash
 cmake -S . -B build

@@ -48,12 +48,26 @@ When an AI agent uses ncurses directly, it must deal with a decades-old C API fu
 
 ## Requirements
 
-- CMake >= 4.0
+- CMake >= 3.20
 - C++20 compiler
 - POSIX-compliant system (Linux, macOS, BSD)
-- SDL3, SDL3_image (for graphical backend, optional)
+- SDL3, SDL3_image (for graphical backend, optional — auto-fetched if not installed)
 
 ## Build
+
+### Linux (Ubuntu/Debian)
+
+Install dependencies first:
+
+```bash
+sudo apt-get install -y \
+  libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+  libxfixes-dev libxss-dev libwayland-dev libxkbcommon-dev \
+  libegl-dev libgl-dev libgles-dev \
+  libasound2-dev libpulse-dev libpipewire-0.3-dev
+```
+
+### Build
 
 ```bash
 cmake -S . -B build
