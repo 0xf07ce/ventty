@@ -1,4 +1,4 @@
-// Copyright (c) 2026 ventty-studio
+// Copyright (c) 2026 Leon J. Lee
 // SPDX-License-Identifier: MIT
 
 #include "Rect.h"

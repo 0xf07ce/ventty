@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.20)
 project(ventty VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(local.cmake OPTIONAL)
+# local.cmake is only loaded when ventty is the top-level project.
+# When consumed via FetchContent, the parent controls options via cache variables.
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    include(local.cmake OPTIONAL)
+endif ()
 
 option(VENTTY_BUILD_GFX      "Build with Graphics Support"    ON)
 option(VENTTY_BUILD_TESTS    "Build Tests"                    ON)
