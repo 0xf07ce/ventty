@@ -74,11 +74,21 @@ bool GfxInput::processEvent(SDL_Event const & event)
             ev.ctrl = (event.key.mod & SDL_KMOD_CTRL) != 0;
             ev.alt = (event.key.mod & SDL_KMOD_ALT) != 0;
 
-            // For printable keys without IME, generate Char events
+            // ASCII printable → generate Char event from key-down.
+            // This ensures character input works even when
+            // SDL_StartTextInput() has not been called (macOS).
             if (ev.key == ventty::KeyEvent::Key::None)
             {
-                // Let TEXT_INPUT handle printable characters
-                return false;
+                SDL_Keycode kc = event.key.key;
+                if (kc >= 0x20 && kc <= 0x7E)
+                {
+                    ev.key = ventty::KeyEvent::Key::Char;
+                    ev.ch = static_cast<char32_t>(kc);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             for (auto & cb : _keyCallbacks)
