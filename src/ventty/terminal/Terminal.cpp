@@ -559,6 +559,17 @@ bool Terminal::pollEvent()
     if (n <= 0)
         return false;
 
+    // Bare ESC: a lone 0x1b byte with no follow-up (n == 1).
+    // Without this, the control-char handler below would misclassify it as Ctrl+{.
+    if (buf[0] == 0x1b && n == 1)
+    {
+        KeyEvent ev;
+        ev.key = KeyEvent::Key::Escape;
+        if (_keyCb)
+            _keyCb(ev);
+        return true;
+    }
+
     // ESC sequence?
     if (buf[0] == 0x1b && n > 1)
     {
