@@ -78,6 +78,14 @@ static void disableMouse()
         "\033[?1015l");
 }
 
+// xterm modifyOtherKeys=1 — terminals that support it will report key
+// combinations like Shift+Enter / Ctrl+Enter using the form
+//   CSI 27 ; <modifier> ; <keycode> ~
+// instead of collapsing them to a bare control byte. Mode 1 only activates
+// for "non-trivial" combinations, so plain typing is unaffected.
+static void enableModifyOtherKeys() { ansi::write("\033[>4;1m"); }
+static void disableModifyOtherKeys() { ansi::write("\033[>4;0m"); }
+
 static void clearScreen() { ansi::write("\033[2J\033[H"); }
 } // namespace ansi
 
@@ -220,6 +228,7 @@ bool Terminal::init()
     ansi::altScreen();
     ansi::hideCursor();
     ansi::enableMouse();
+    ansi::enableModifyOtherKeys();
     ansi::clearScreen();
 
     querySize();
@@ -238,6 +247,7 @@ void Terminal::shutdown()
         return;
     _running = false;
 
+    ansi::disableModifyOtherKeys();
     ansi::disableMouse();
     tcflush(STDIN_FILENO, TCIFLUSH);
 
@@ -619,73 +629,101 @@ bool Terminal::pollEvent()
                 return true;
             }
 
-            // Arrow keys and special keys
+            // Generic CSI: ESC [ <param> (; <param>)* <final>
+            // Captures up to 4 numeric params; param[1] (when present) is the
+            // standard xterm modifier byte (1 + bitmask of shift/alt/ctrl).
+            int params[4] = { 0, 0, 0, 0 };
+            int pCount = 0;
+            int pos = 2;
+            bool seenDigit = false;
+            while (pos < n)
+            {
+                unsigned char b = buf[pos];
+                if (b >= '0' && b <= '9')
+                {
+                    if (pCount < 4) params[pCount] = params[pCount] * 10 + (b - '0');
+                    seenDigit = true;
+                    ++pos;
+                }
+                else if (b == ';')
+                {
+                    if (pCount < 3) ++pCount;
+                    seenDigit = false;
+                    ++pos;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (seenDigit && pCount < 4) ++pCount;
+            if (pos >= n) return true;
+            char final = static_cast<char>(buf[pos]);
+
             KeyEvent ev;
-            if (n == 3)
+            if (pCount >= 2)
             {
-                switch (buf[2])
+                int mod = params[1] - 1;
+                if (mod >= 0)
                 {
-                case 'A': ev.key = KeyEvent::Key::Up;
-                    break;
-                case 'B': ev.key = KeyEvent::Key::Down;
-                    break;
-                case 'C': ev.key = KeyEvent::Key::Right;
-                    break;
-                case 'D': ev.key = KeyEvent::Key::Left;
-                    break;
-                case 'H': ev.key = KeyEvent::Key::Home;
-                    break;
-                case 'F': ev.key = KeyEvent::Key::End;
-                    break;
-                default: return true;
+                    ev.shift = (mod & 1) != 0;
+                    ev.alt   = (mod & 2) != 0;
+                    ev.ctrl  = (mod & 4) != 0;
                 }
-                if (_keyCb)
-                    _keyCb(ev);
-                return true;
             }
 
-            // Extended: ESC [ N ~
-            if (n >= 4 && buf[n - 1] == '~')
+            switch (final)
             {
-                int code = 0;
-                for (int i = 2; i < n - 1; ++i)
+            case 'A': ev.key = KeyEvent::Key::Up;    break;
+            case 'B': ev.key = KeyEvent::Key::Down;  break;
+            case 'C': ev.key = KeyEvent::Key::Right; break;
+            case 'D': ev.key = KeyEvent::Key::Left;  break;
+            case 'H': ev.key = KeyEvent::Key::Home;  break;
+            case 'F': ev.key = KeyEvent::Key::End;   break;
+            case 'Z': ev.key = KeyEvent::Key::Tab;   ev.shift = true; break;
+            case '~':
+                // xterm modifyOtherKeys form: CSI 27 ; <mod> ; <key> ~
+                if (params[0] == 27 && pCount >= 3)
                 {
-                    if (buf[i] >= '0' && buf[i] <= '9')
-                        code = code * 10 + (buf[i] - '0');
+                    char32_t k = static_cast<char32_t>(params[2]);
+                    switch (k)
+                    {
+                    case 13: ev.key = KeyEvent::Key::Enter;     break;
+                    case 9:  ev.key = KeyEvent::Key::Tab;       break;
+                    case 8:
+                    case 127: ev.key = KeyEvent::Key::Backspace; break;
+                    case 27: ev.key = KeyEvent::Key::Escape;    break;
+                    default:
+                        ev.key = KeyEvent::Key::Char;
+                        ev.ch  = k;
+                        break;
+                    }
                 }
-                switch (code)
+                else
                 {
-                case 2: ev.key = KeyEvent::Key::Insert;
-                    break;
-                case 3: ev.key = KeyEvent::Key::Delete;
-                    break;
-                case 5: ev.key = KeyEvent::Key::PageUp;
-                    break;
-                case 6: ev.key = KeyEvent::Key::PageDown;
-                    break;
-                case 15: ev.key = KeyEvent::Key::F5;
-                    break;
-                case 17: ev.key = KeyEvent::Key::F6;
-                    break;
-                case 18: ev.key = KeyEvent::Key::F7;
-                    break;
-                case 19: ev.key = KeyEvent::Key::F8;
-                    break;
-                case 20: ev.key = KeyEvent::Key::F9;
-                    break;
-                case 21: ev.key = KeyEvent::Key::F10;
-                    break;
-                case 23: ev.key = KeyEvent::Key::F11;
-                    break;
-                case 24: ev.key = KeyEvent::Key::F12;
-                    break;
-                default: return true;
+                    switch (params[0])
+                    {
+                    case 2:  ev.key = KeyEvent::Key::Insert;   break;
+                    case 3:  ev.key = KeyEvent::Key::Delete;   break;
+                    case 5:  ev.key = KeyEvent::Key::PageUp;   break;
+                    case 6:  ev.key = KeyEvent::Key::PageDown; break;
+                    case 15: ev.key = KeyEvent::Key::F5;       break;
+                    case 17: ev.key = KeyEvent::Key::F6;       break;
+                    case 18: ev.key = KeyEvent::Key::F7;       break;
+                    case 19: ev.key = KeyEvent::Key::F8;       break;
+                    case 20: ev.key = KeyEvent::Key::F9;       break;
+                    case 21: ev.key = KeyEvent::Key::F10;      break;
+                    case 23: ev.key = KeyEvent::Key::F11;      break;
+                    case 24: ev.key = KeyEvent::Key::F12;      break;
+                    default: return true;
+                    }
                 }
-                if (_keyCb)
-                    _keyCb(ev);
+                break;
+            default:
                 return true;
             }
-
+            if (_keyCb)
+                _keyCb(ev);
             return true;
         }
 
