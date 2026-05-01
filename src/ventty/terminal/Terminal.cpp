@@ -768,8 +768,8 @@ bool Terminal::pollEvent()
         return true;
     }
 
-    // Control characters
-    if (buf[0] < 0x20)
+    // Control characters (0x7f is DEL — what most terminals send for Backspace)
+    if (buf[0] < 0x20 || buf[0] == 0x7f)
     {
         KeyEvent ev;
         switch (buf[0])
@@ -778,6 +778,7 @@ bool Terminal::pollEvent()
             break;
         case 0x09: ev.key = KeyEvent::Key::Tab;
             break;
+        case 0x08:
         case 0x7f: ev.key = KeyEvent::Key::Backspace;
             break;
         default:
