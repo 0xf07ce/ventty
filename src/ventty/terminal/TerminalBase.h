@@ -86,6 +86,16 @@ using KeyCallback = std::function<void(KeyEvent const &)>;
 /// Mouse event callback type
 using MouseCallback = std::function<void(MouseEvent const &)>;
 
+/// Mouse reporting mode.
+/// - ButtonEvent: button presses, releases, drags only (?1002h). Default.
+/// - AnyEvent: every cursor movement is also reported (?1003h). Use only when
+///   the app actually consumes hover/move events — the byte volume is large.
+enum class MouseMode
+{
+    ButtonEvent,
+    AnyEvent,
+};
+
 /// Resize event callback type
 using ResizeCallback = std::function<void(ResizeEvent const &)>;
 
@@ -177,6 +187,10 @@ public:
 
     /// Register a mouse event callback
     virtual void onMouse(MouseCallback cb) = 0;
+
+    /// Set the mouse reporting mode. Default no-op for backends that don't
+    /// rely on terminal escape sequences for mouse input.
+    virtual void setMouseMode(MouseMode /*mode*/) {}
 
     /// Register a resize event callback
     virtual void onResize(ResizeCallback cb) = 0;

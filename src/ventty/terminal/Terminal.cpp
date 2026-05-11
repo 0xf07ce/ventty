@@ -67,7 +67,16 @@ static void hideCursor() { ansi::write("\033[?25l"); }
 static void showCursor() { ansi::write("\033[?25h"); }
 static void altScreen() { ansi::write("\033[?1049h"); }
 static void mainScreen() { ansi::write("\033[?1049l"); }
-static void enableMouse() { ansi::write("\033[?1003h\033[?1006h"); }
+// Default to ?1002h (button events + drags only). ?1003h floods stdin with a
+// motion event for every cursor pixel and was the practical reason input
+// parsing kept getting overwhelmed; opt into it with setMouseMode if needed.
+static void enableMouse(MouseMode mode = MouseMode::ButtonEvent)
+{
+    if (mode == MouseMode::AnyEvent)
+        ansi::write("\033[?1003h\033[?1006h");
+    else
+        ansi::write("\033[?1002h\033[?1006h");
+}
 
 static void disableMouse()
 {
@@ -865,4 +874,17 @@ size_t Terminal::parseEventFromBuffer(unsigned char const * buf, size_t n)
 void Terminal::onKey(KeyCallback cb) { _keyCb = std::move(cb); }
 void Terminal::onMouse(MouseCallback cb) { _mouseCb = std::move(cb); }
 void Terminal::onResize(ResizeCallback cb) { _resizeCb = std::move(cb); }
+
+void Terminal::setMouseMode(MouseMode mode)
+{
+    if (!_impl->rawMode)
+        return;
+    // Disable any mode currently active, then enable the requested one. SGR
+    // (?1006) stays on regardless.
+    ansi::write("\033[?1003l\033[?1002l");
+    if (mode == MouseMode::AnyEvent)
+        ansi::write("\033[?1003h");
+    else
+        ansi::write("\033[?1002h");
+}
 } // namespace ventty

@@ -98,6 +98,9 @@ public:
     /// Register a mouse event callback
     void onMouse(MouseCallback cb) override;
 
+    /// Switch between button-event-only (?1002h) and any-event (?1003h) reporting.
+    void setMouseMode(MouseMode mode) override;
+
     /// Register a resize event callback
     void onResize(ResizeCallback cb) override;
 
