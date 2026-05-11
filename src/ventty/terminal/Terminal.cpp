@@ -95,6 +95,11 @@ struct Terminal::Impl
 {
     struct termios origTermios {};
     bool rawMode = false;
+    // Carry-over for partial input sequences split across read() calls.
+    // Without this, a mouse event sliced mid-sequence (very common with
+    // ?1003h flooding the 32-byte read window) was either dropped or its
+    // tail bytes were misparsed as char keypresses.
+    std::vector<unsigned char> inputBuf;
 };
 
 static volatile sig_atomic_t gResizeFlag = 0;
@@ -564,44 +569,90 @@ bool Terminal::pollEvent()
         handleResize();
     }
 
-    unsigned char buf[32];
-    auto n = ::read(STDIN_FILENO, buf, sizeof(buf));
-    if (n <= 0)
+    // Drain whatever stdin currently has into the carry-over buffer so that
+    // sequences split across reads (mouse SGR is the common offender) survive
+    // intact instead of being half-parsed and half-misinterpreted as keys.
+    unsigned char tmp[256];
+    auto n = ::read(STDIN_FILENO, tmp, sizeof(tmp));
+    if (n > 0)
+        _impl->inputBuf.insert(_impl->inputBuf.end(), tmp, tmp + n);
+
+    if (_impl->inputBuf.empty())
         return false;
 
-    // Bare ESC: a lone 0x1b byte with no follow-up (n == 1).
-    // Without this, the control-char handler below would misclassify it as Ctrl+{.
-    if (buf[0] == 0x1b && n == 1)
+    size_t consumed = parseEventFromBuffer(_impl->inputBuf.data(),
+                                           _impl->inputBuf.size());
+    if (consumed > 0)
+    {
+        _impl->inputBuf.erase(_impl->inputBuf.begin(),
+                              _impl->inputBuf.begin() + consumed);
+        return true;
+    }
+
+    // parseEventFromBuffer returned 0 → front byte starts an incomplete
+    // sequence. The classic case is a lone ESC: with no follow-up arriving,
+    // treat it as the user actually pressing Escape (xterm timeout heuristic).
+    if (_impl->inputBuf.size() == 1 && _impl->inputBuf[0] == 0x1b)
     {
         KeyEvent ev;
         ev.key = KeyEvent::Key::Escape;
         if (_keyCb)
             _keyCb(ev);
+        _impl->inputBuf.clear();
         return true;
     }
 
-    // ESC sequence?
-    if (buf[0] == 0x1b && n > 1)
+    // Defensive cap so a stuck/never-terminated sequence can't grow without bound.
+    if (_impl->inputBuf.size() > 4096)
+        _impl->inputBuf.clear();
+
+    return false;
+}
+
+size_t Terminal::parseEventFromBuffer(unsigned char const * buf, size_t n)
+{
+    if (n == 0)
+        return 0;
+
+    // ESC sequence
+    if (buf[0] == 0x1b)
     {
-        // CSI sequence: ESC [ ...
+        if (n < 2)
+            return 0; // bare-ESC heuristic handled by caller
+
+        // CSI: ESC [ ...
         if (buf[1] == '[')
         {
+            if (n < 3)
+                return 0;
+
             // SGR mouse: ESC [ < Cb ; Cx ; Cy M/m
-            if (n > 2 && buf[2] == '<')
+            if (buf[2] == '<')
             {
+                size_t end = 3;
+                while (end < n && buf[end] != 'M' && buf[end] != 'm')
+                {
+                    unsigned char b = buf[end];
+                    if (b != ';' && (b < '0' || b > '9'))
+                        break; // malformed inside the params
+                    ++end;
+                }
+                if (end >= n)
+                    return 0; // terminator not in buffer yet
+                if (buf[end] != 'M' && buf[end] != 'm')
+                    return 3; // malformed: drop ESC[< and resync
+
                 int cb = 0, cx = 0, cy = 0;
-                char trail = 0;
-                int pos = 3;
-                while (pos < n && buf[pos] != ';')
+                size_t pos = 3;
+                while (pos < end && buf[pos] != ';')
                     cb = cb * 10 + (buf[pos++] - '0');
-                pos++;
-                while (pos < n && buf[pos] != ';')
+                if (pos < end) ++pos;
+                while (pos < end && buf[pos] != ';')
                     cx = cx * 10 + (buf[pos++] - '0');
-                pos++;
-                while (pos < n && buf[pos] != 'M' && buf[pos] != 'm')
+                if (pos < end) ++pos;
+                while (pos < end)
                     cy = cy * 10 + (buf[pos++] - '0');
-                if (pos < n)
-                    trail = static_cast<char>(buf[pos]);
+                char trail = static_cast<char>(buf[end]);
 
                 MouseEvent ev;
                 ev.x = cx - 1;
@@ -626,15 +677,13 @@ bool Terminal::pollEvent()
 
                 if (_mouseCb)
                     _mouseCb(ev);
-                return true;
+                return end + 1;
             }
 
             // Generic CSI: ESC [ <param> (; <param>)* <final>
-            // Captures up to 4 numeric params; param[1] (when present) is the
-            // standard xterm modifier byte (1 + bitmask of shift/alt/ctrl).
             int params[4] = { 0, 0, 0, 0 };
             int pCount = 0;
-            int pos = 2;
+            size_t pos = 2;
             bool seenDigit = false;
             while (pos < n)
             {
@@ -656,8 +705,9 @@ bool Terminal::pollEvent()
                     break;
                 }
             }
+            if (pos >= n)
+                return 0; // final byte not yet in buffer
             if (seenDigit && pCount < 4) ++pCount;
-            if (pos >= n) return true;
             char final = static_cast<char>(buf[pos]);
 
             KeyEvent ev;
@@ -715,41 +765,39 @@ bool Terminal::pollEvent()
                     case 21: ev.key = KeyEvent::Key::F10;      break;
                     case 23: ev.key = KeyEvent::Key::F11;      break;
                     case 24: ev.key = KeyEvent::Key::F12;      break;
-                    default: return true;
+                    default: return pos + 1;
                     }
                 }
                 break;
             default:
-                return true;
+                return pos + 1;
             }
             if (_keyCb)
                 _keyCb(ev);
-            return true;
+            return pos + 1;
         }
 
-        // ESC O sequences (F1-F4)
-        if (buf[1] == 'O' && n >= 3)
+        // ESC O sequences (F1-F4): ESC O X
+        if (buf[1] == 'O')
         {
+            if (n < 3)
+                return 0;
             KeyEvent ev;
             switch (buf[2])
             {
-            case 'P': ev.key = KeyEvent::Key::F1;
-                break;
-            case 'Q': ev.key = KeyEvent::Key::F2;
-                break;
-            case 'R': ev.key = KeyEvent::Key::F3;
-                break;
-            case 'S': ev.key = KeyEvent::Key::F4;
-                break;
-            default: return true;
+            case 'P': ev.key = KeyEvent::Key::F1; break;
+            case 'Q': ev.key = KeyEvent::Key::F2; break;
+            case 'R': ev.key = KeyEvent::Key::F3; break;
+            case 'S': ev.key = KeyEvent::Key::F4; break;
+            default: return 3;
             }
             if (_keyCb)
                 _keyCb(ev);
-            return true;
+            return 3;
         }
 
         // Alt+key: ESC + printable
-        if (n == 2 && buf[1] >= 0x20)
+        if (buf[1] >= 0x20)
         {
             KeyEvent ev;
             ev.key = KeyEvent::Key::Char;
@@ -757,15 +805,11 @@ bool Terminal::pollEvent()
             ev.alt = true;
             if (_keyCb)
                 _keyCb(ev);
-            return true;
+            return 2;
         }
 
-        // Bare ESC
-        KeyEvent ev;
-        ev.key = KeyEvent::Key::Escape;
-        if (_keyCb)
-            _keyCb(ev);
-        return true;
+        // ESC + control byte (unknown sequence): drop just ESC and resync.
+        return 1;
     }
 
     // Control characters (0x7f is DEL — what most terminals send for Backspace)
@@ -789,24 +833,33 @@ bool Terminal::pollEvent()
         }
         if (_keyCb)
             _keyCb(ev);
-        return true;
+        return 1;
     }
 
-    // UTF-8 character(s)
-    std::string_view sv(reinterpret_cast<char const *>(buf), static_cast<size_t>(n));
+    // UTF-8 character — wait if the multi-byte sequence is not yet complete.
+    unsigned char b0 = buf[0];
+    size_t need;
+    if (b0 < 0x80)               need = 1;
+    else if ((b0 & 0xE0) == 0xC0) need = 2;
+    else if ((b0 & 0xF0) == 0xE0) need = 3;
+    else if ((b0 & 0xF8) == 0xF0) need = 4;
+    else                          return 1; // stray continuation byte: drop
+
+    if (n < need)
+        return 0;
+
+    std::string_view sv(reinterpret_cast<char const *>(buf), need);
     size_t pos = 0;
-    while (pos < sv.size())
+    char32_t cp = decode(sv, pos);
+    if (cp != U'\0')
     {
-        auto cp = decode(sv, pos);
-        if (cp == U'\0')
-            break;
         KeyEvent ev;
         ev.key = KeyEvent::Key::Char;
         ev.ch = cp;
         if (_keyCb)
             _keyCb(ev);
     }
-    return true;
+    return need;
 }
 
 void Terminal::onKey(KeyCallback cb) { _keyCb = std::move(cb); }

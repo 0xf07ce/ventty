@@ -146,5 +146,10 @@ private:
 
     /// Handle terminal resize
     void handleResize();
+
+    /// Parse one input event from the front of `buf`. Returns the number of
+    /// bytes consumed, or 0 if `buf` holds an incomplete sequence that needs
+    /// more bytes. Dispatches via the registered key/mouse callbacks.
+    size_t parseEventFromBuffer(unsigned char const * buf, size_t n);
 };
 } // namespace ventty
