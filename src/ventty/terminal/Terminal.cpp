@@ -109,6 +109,14 @@ struct Terminal::Impl
     // ?1003h flooding the 32-byte read window) was either dropped or its
     // tail bytes were misparsed as char keypresses.
     std::vector<unsigned char> inputBuf;
+    // Re-entrancy guard. parseEventFromBuffer() dispatches user callbacks
+    // (_keyCb / _mouseCb) while the caller still owns `inputBuf`; if a
+    // callback pumps events by calling back into pollEvent() (e.g. a
+    // progress tick run from inside a key handler), the nested call would
+    // mutate/realloc `inputBuf` out from under the outer frame, which then
+    // erase()s with a stale, now-out-of-range count → negative-size
+    // memmove and heap corruption. A nested pollEvent() is a no-op.
+    bool inPoll = false;
 };
 
 static volatile sig_atomic_t gResizeFlag = 0;
@@ -566,6 +574,18 @@ void Terminal::render()
 
 bool Terminal::pollEvent()
 {
+    // A callback dispatched below may pump events by calling pollEvent()
+    // again; that nested call must not touch the shared `inputBuf` the
+    // outer frame is mid-parse on (see Impl::inPoll). Treat it as a no-op.
+    if (_impl->inPoll)
+        return false;
+    _impl->inPoll = true;
+    struct PollGuard
+    {
+        bool & flag;
+        ~PollGuard() { flag = false; }
+    } pollGuard{_impl->inPoll};
+
     if (gTermFlag)
     {
         _running = false;
@@ -591,6 +611,10 @@ bool Terminal::pollEvent()
 
     size_t consumed = parseEventFromBuffer(_impl->inputBuf.data(),
                                            _impl->inputBuf.size());
+    // Never erase past the end: a parser that over-reports, or a buffer
+    // mutated by a callback, must not turn into a negative-size memmove.
+    if (consumed > _impl->inputBuf.size())
+        consumed = _impl->inputBuf.size();
     if (consumed > 0)
     {
         _impl->inputBuf.erase(_impl->inputBuf.begin(),
