@@ -22,6 +22,8 @@ add_library(ventty STATIC
     # art
     ventty/art/AsciiArt.h
     ventty/art/AsciiArt.cpp
+    ventty/art/BrailleCanvas.h
+    ventty/art/BrailleCanvas.cpp
 
     # widget
     ventty/widget/Widget.h

@@ -20,3 +20,4 @@
 
 // art
 #include "art/AsciiArt.h"
+#include "art/BrailleCanvas.h"

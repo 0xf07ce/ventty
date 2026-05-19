@@ -5,10 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0/).
 
-## 0.2.0 (Unreleased)
+## 0.2.0 - 2026-05-19
 
 ### Added
 
+- `art/BrailleCanvas`: off-screen Braille sub-pixel canvas (2x4 dots per
+  cell) with `set`/`unset`/`get`, Bresenham `line`, and `blit` into a
+  `Window`. Generalizes the per-cell braille trick used by oscilloscope-
+  and vinyl-style plots; dot-to-bit mapping matches `BraillePlot::setDot`.
 - Modifier-aware key reporting via xterm `modifyOtherKeys=1`.
 - `MouseMode` setting, defaulting to button-event reporting.
 
