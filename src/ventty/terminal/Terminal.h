@@ -37,6 +37,12 @@ public:
     /// Force a full screen redraw
     void forceRedraw() override;
 
+    /// Park the hardware cursor at (x, y) on the next render().
+    void setCursorPos(int x, int y) override;
+
+    /// Show or hide the hardware cursor.
+    void setCursorVisible(bool visible) override;
+
     // -- drawing on the root screen --
 
     /// Clear the root screen with default style
@@ -128,6 +134,13 @@ private:
     std::vector<Cell> _screen; ///< Composited frame
     std::vector<Cell> _prev;   ///< Previous frame (for diff comparison)
     bool _fullRedraw = true;   ///< Full redraw flag
+
+    /// Hardware cursor staging area: render() emits these after emitDiff
+    /// so the cursor lands on top of the freshly-written cells. Init keeps
+    /// the cursor hidden; setCursorVisible() flips it on.
+    int  _hwCursorX = 0;
+    int  _hwCursorY = 0;
+    bool _hwCursorVisible = false;
 
     std::vector<std::unique_ptr<Window>> _windows; ///< Managed window list
 

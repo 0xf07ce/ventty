@@ -100,7 +100,8 @@ enum class MouseMode
 using ResizeCallback = std::function<void(ResizeEvent const &)>;
 
 /// Abstract terminal interface — backend-agnostic.
-/// Concrete implementations: AnsiTerminal (ANSI/VT), gfx::GfxTerminal (SDL3).
+/// Concrete implementations: Terminal (ANSI/VT, this project); GfxTerminal
+/// (SDL3 window, sibling project ventty-sdl).
 class TerminalBase
 {
 public:
@@ -122,6 +123,23 @@ public:
 
     /// Force a full screen redraw
     virtual void forceRedraw() = 0;
+
+    // -- hardware cursor --
+    //
+    // Most TUI apps suppress the terminal cursor while drawing a buffered
+    // grid; ventty does this on startup. Text-input widgets need it back,
+    // though, so they can show where typing will land. These two calls
+    // park the hardware cursor at a cell and toggle its visibility — the
+    // ANSI backend emits the escapes after each render(); GUI backends
+    // (ventty-sdl) ignore them and may draw their own cursor instead.
+
+    /// Move the hardware cursor to cell (x, y). 0-based, like everywhere
+    /// else in this API. Takes effect on the next render().
+    virtual void setCursorPos(int /*x*/, int /*y*/) {}
+
+    /// Show or hide the hardware cursor. The flag is sticky — call once
+    /// when the input widget opens / closes, not every frame.
+    virtual void setCursorVisible(bool /*visible*/) {}
 
     // -- drawing on root screen --
 

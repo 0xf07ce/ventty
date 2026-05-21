@@ -15,7 +15,9 @@ A modern C++20 terminal UI library designed for both humans and AI agents.
 
 ## Overview
 
-**ventty** is a cell-based terminal abstraction library that provides high-level building blocks for creating TUI (Text User Interface) and graphical terminal applications. It features diff-based rendering, overlapping window management, full Unicode/UTF-8 support, 24-bit true color, and a widget toolkit. Two backends are available: ANSI/VT100 for real terminals and SDL3 for graphical windows.
+**ventty** is a cell-based terminal abstraction library that provides high-level building blocks for creating TUI (Text User Interface) applications on POSIX terminals. It features diff-based rendering, overlapping window management, full Unicode/UTF-8 support, 24-bit true color, and a widget toolkit. The backend is ANSI/VT100 over termios.
+
+For a graphical (SDL3 window) backend, see the sibling project [ventty-sdl](../ventty-sdl). A Windows Console backend lives in [ventty-win](../ventty-win) (scaffolding only).
 
 ## Why ventty?
 
@@ -29,7 +31,7 @@ When an AI agent uses ncurses directly, it must deal with a decades-old C API fu
 |---|---|---|
 | **Language** | C API with global state | C++20, no global state |
 | **Rendering** | Imperative cursor movement | Cell-based with automatic diff |
-| **Backend** | Terminal only | Terminal + SDL3 graphical window |
+| **Backend** | Terminal only | POSIX terminal (sibling `ventty-sdl` adds SDL3 GUI) |
 | **Unicode** | Partial, configuration-dependent | Built-in UTF-8 with Korean support |
 | **Widgets** | None (separate libraries needed) | Dialog, Menu, ListView, Label built-in |
 | **AI friendliness** | Low — implicit state, macros, footguns | High — typed API, RAII, zero implicit state |
@@ -44,14 +46,13 @@ When an AI agent uses ncurses directly, it must deal with a decades-old C API fu
 - **Input handling** — Keyboard (with modifiers), mouse events, and terminal resize detection
 - **Widget toolkit** — Label, ListView, Dialog, InputDialog, Menu/MenuBar widgets
 - **ASCII art toolkit** — Box drawing, spinners, progress bars, bar graphs, and braille plotting
-- **Dual backends** — ANSI terminal (`ventty::Terminal`) and SDL3 graphical window (`ventty::GfxTerminal`)
+- **ANSI/VT100 terminal backend** (`ventty::Terminal`) over termios raw mode
 
 ## Requirements
 
 - CMake >= 3.20
 - C++20 compiler
 - POSIX-compliant system (Linux, macOS, BSD)
-- SDL3 (for graphical backend, optional — auto-fetched if not installed)
 
 ## Build
 
@@ -75,9 +76,14 @@ Options:
 
 | Option | Default | Description |
 |---|---|---|
-| `VENTTY_BUILD_GFX` | `OFF` | Build SDL3 graphical backend |
 | `VENTTY_BUILD_TESTS` | `ON` | Build unit tests |
 | `VENTTY_BUILD_EXAMPLES` | `ON` | Build example programs |
+| `VENTTY_INSTALL` | `ON` (top-level) | Generate install / CMake package export rules |
+
+## Sibling projects
+
+- [ventty-sdl](../ventty-sdl) — SDL3 graphical backend (`GfxTerminal`, embedded CP437/Hangul/Jamo fonts). Use this to render ventty UIs into a native window.
+- [ventty-win](../ventty-win) — Windows Console backend (scaffolding only, not yet implemented).
 
 ## Documentation
 

@@ -568,6 +568,33 @@ void Terminal::render()
 
     composite();
     emitDiff();
+
+    // After emitDiff the hardware cursor sits at the last-written cell.
+    // Park it where the host asked (text-input widgets) and toggle
+    // visibility every frame so the right state is enforced even if the
+    // diff pass didn't write anything this frame.
+    if (_hwCursorVisible)
+    {
+        int const cx = std::clamp(_hwCursorX, 0, _cols > 0 ? _cols - 1 : 0);
+        int const cy = std::clamp(_hwCursorY, 0, _rows > 0 ? _rows - 1 : 0);
+        ansi::moveTo(cx, cy);
+        ansi::showCursor();
+    }
+    else
+    {
+        ansi::hideCursor();
+    }
+}
+
+void Terminal::setCursorPos(int x, int y)
+{
+    _hwCursorX = x;
+    _hwCursorY = y;
+}
+
+void Terminal::setCursorVisible(bool visible)
+{
+    _hwCursorVisible = visible;
 }
 
 // -- Input Parsing --

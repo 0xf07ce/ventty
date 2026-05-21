@@ -26,9 +26,3 @@ target_link_libraries(demo_widget_dialog PRIVATE ventty)
 
 add_executable(demo_widget_menu demo_widget_menu.cpp)
 target_link_libraries(demo_widget_menu PRIVATE ventty)
-
-# SDL3 graphical demo
-if (VENTTY_BUILD_GFX)
-    add_executable(demo_gfx_terminal demo_gfx_terminal.cpp)
-    target_link_libraries(demo_gfx_terminal PRIVATE ventty_gfx)
-endif ()

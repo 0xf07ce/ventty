@@ -15,7 +15,9 @@
 
 ## 개요
 
-**ventty**는 TUI(Text User Interface) 및 그래픽 터미널 애플리케이션을 만들기 위한 셀 기반 터미널 추상화 라이브러리입니다. diff 기반 렌더링, 겹침 윈도우 관리, 유니코드/UTF-8 지원, 24비트 트루컬러, 위젯 툴킷을 제공합니다. ANSI/VT100 터미널 백엔드와 SDL3 그래픽 백엔드를 지원합니다.
+**ventty**는 POSIX 터미널 위에서 TUI(Text User Interface)를 만들기 위한 셀 기반 터미널 추상화 라이브러리입니다. diff 기반 렌더링, 겹침 윈도우 관리, 유니코드/UTF-8 지원, 24비트 트루컬러, 위젯 툴킷을 제공합니다. 백엔드는 termios 위의 ANSI/VT100 입니다.
+
+SDL3 기반 그래픽 윈도우 백엔드는 형제 프로젝트 [ventty-sdl](../ventty-sdl)에 있습니다. Windows 콘솔 백엔드는 [ventty-win](../ventty-win)(현재 스캐폴딩만).
 
 ## 왜 ventty인가?
 
@@ -29,7 +31,7 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 |---|---|---|
 | **언어** | 전역 상태를 가진 C API | C++20, 전역 상태 없음 |
 | **렌더링** | 명령형 커서 이동 | 셀 기반 자동 diff |
-| **백엔드** | 터미널 전용 | 터미널 + SDL3 그래픽 윈도우 |
+| **백엔드** | 터미널 전용 | POSIX 터미널 (형제 `ventty-sdl` 가 SDL3 GUI 제공) |
 | **유니코드** | 부분적, 설정에 의존 | UTF-8 내장, 한국어 기본 지원 |
 | **위젯** | 없음 (별도 라이브러리 필요) | Dialog, Menu, ListView, Label 내장 |
 | **AI 친화성** | 낮음 — 암묵적 상태, 매크로, 함정 | 높음 — 타입 기반 API, RAII, 암묵적 상태 없음 |
@@ -44,14 +46,13 @@ AI 에이전트가 ncurses를 직접 사용하면 수십 년 된 C API의 암묵
 - **입력 처리** — 키보드(수정자 키 포함), 마우스 이벤트, 터미널 크기 변경 감지
 - **위젯 툴킷** — Label, ListView, Dialog, InputDialog, Menu/MenuBar
 - **ASCII 아트 툴킷** — 박스 그리기, 스피너, 프로그레스 바, 막대 그래프, 점자 플롯
-- **듀얼 백엔드** — ANSI 터미널 (`ventty::Terminal`) 및 SDL3 그래픽 윈도우 (`ventty::GfxTerminal`)
+- **ANSI/VT100 터미널 백엔드** (`ventty::Terminal`) — termios raw 모드
 
 ## 요구사항
 
 - CMake >= 3.20
 - C++20 컴파일러
 - POSIX 호환 시스템 (Linux, macOS, BSD)
-- SDL3 (그래픽 백엔드용, 선택사항 — 미설치 시 자동 획득)
 
 ## 빌드
 
@@ -75,9 +76,14 @@ cmake --build build
 
 | 옵션 | 기본값 | 설명 |
 |---|---|---|
-| `VENTTY_BUILD_GFX` | `OFF` | SDL3 그래픽 백엔드 빌드 |
 | `VENTTY_BUILD_TESTS` | `ON` | 단위 테스트 빌드 |
 | `VENTTY_BUILD_EXAMPLES` | `ON` | 예제 프로그램 빌드 |
+| `VENTTY_INSTALL` | `ON` (top-level) | install / CMake 패키지 export 룰 생성 |
+
+## 형제 프로젝트
+
+- [ventty-sdl](../ventty-sdl) — SDL3 그래픽 백엔드 (`GfxTerminal`, CP437/한글/자모 내장 폰트). ventty UI 를 네이티브 윈도우로 띄우려면 사용.
+- [ventty-win](../ventty-win) — Windows 콘솔 백엔드 (스캐폴딩만, 미구현).
 
 ## 문서
 
