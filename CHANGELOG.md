@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.3.1 - 2026-05-28
+
+### Fixed
+
+- `Utf8::isFullwidth` now covers the East Asian Wide / Fullwidth ranges
+  per Unicode UAX #11. The previous table omitted Hiragana, Katakana,
+  and several adjacent blocks, so kana such as U+306E (の) were treated
+  as width 1 and overwritten by neighboring fullwidth glyphs on the
+  terminal grid.
+
 ## 0.3.0 - 2026-05-22
 
 ### Added
