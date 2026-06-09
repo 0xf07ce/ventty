@@ -226,7 +226,13 @@ bool Terminal::init()
     raw.c_iflag &= ~static_cast<tcflag_t>(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~static_cast<tcflag_t>(OPOST);
     raw.c_cflag |= CS8;
-    raw.c_lflag &= ~static_cast<tcflag_t>(ECHO | ICANON | IEXTEN);
+    // Clear ISIG as well: a full-screen TUI wants Ctrl+C / Ctrl+\ / Ctrl+Z to
+    // arrive as ordinary key bytes (so the application can bind or ignore them)
+    // rather than have the line discipline raise SIGINT / SIGQUIT / SIGTSTP,
+    // which would kill or suspend the program and skip its teardown (terminal
+    // restore, etc.). Without this, e.g. an accidental Ctrl+\ terminates the
+    // app via SIGQUIT.
+    raw.c_lflag &= ~static_cast<tcflag_t>(ECHO | ICANON | IEXTEN | ISIG);
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 0;
 

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.1 - 2026-06-09
+
+### Fixed
+
+- Raw mode now also clears `ISIG`, so Ctrl+C / Ctrl+\ / Ctrl+Z reach the
+  application as ordinary key bytes instead of raising SIGINT / SIGQUIT /
+  SIGTSTP. Previously an accidental Ctrl+\ terminated a full-screen TUI via
+  SIGQUIT (bypassing its teardown); control keys are now the app's to handle
+  or ignore.
+
 ## 0.4.0 - 2026-06-09
 
 ### Added
