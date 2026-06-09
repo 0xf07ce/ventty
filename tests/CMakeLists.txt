@@ -13,3 +13,7 @@ target_link_libraries(test_window PRIVATE ventty)
 
 add_executable(test_ascii_art test_ascii_art.cpp)
 target_link_libraries(test_ascii_art PRIVATE ventty)
+
+add_executable(test_input test_input.cpp)
+target_link_libraries(test_input PRIVATE ventty)
+add_test(NAME test_input COMMAND test_input)

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.0 - 2026-06-09
+
+### Added
+
+- `ventty/input/` — a modal, configurable input engine that resolves a key
+  stream to opaque action tokens. It owns the vi-style grammar (modes, numeric
+  repeat counts, chord sequences) so consumers only supply bindings and give
+  the tokens meaning:
+  - `KeyChord` — a normalized keypress with vim-notation parsing/printing
+    (`<C-w>`, `<CR>`, `<Esc>`, `<C-Up>`, `dd`, `gg`) and `from(KeyEvent)`.
+  - `Keymap` — a trie of chord sequences mapped to tokens, with
+    NoMatch / Pending / Matched resolution so a bound prefix waits for the
+    next key without a timer.
+  - `InputEngine` — current mode, a count accumulator (with the vim `0` rule),
+    a pending-chord buffer, timeout-free prefix handling, and `feedEsc()` to
+    cancel a pending count/chord or leave a non-initial mode.
+  - `KeymapFile` — a parser for vim-style preset directives
+    (`modes = …`, `counts = on|off`, `map <mode> <lhs> <token>`) with an
+    optional token validator; `motion`/`op` are reserved for a future
+    operator+motion tier.
+- `tests/test_input.cpp` — headless unit tests for the input engine.
+
 ## 0.3.1 - 2026-05-28
 
 ### Fixed

@@ -21,3 +21,9 @@
 // art
 #include "art/AsciiArt.h"
 #include "art/BrailleCanvas.h"
+
+// input
+#include "input/InputEngine.h"
+#include "input/KeyChord.h"
+#include "input/Keymap.h"
+#include "input/KeymapFile.h"

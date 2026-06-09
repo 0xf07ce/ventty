@@ -39,6 +39,16 @@ add_library(ventty STATIC
     ventty/widget/Menu.h
     ventty/widget/Menu.cpp
 
+    # input
+    ventty/input/KeyChord.h
+    ventty/input/KeyChord.cpp
+    ventty/input/Keymap.h
+    ventty/input/Keymap.cpp
+    ventty/input/InputEngine.h
+    ventty/input/InputEngine.cpp
+    ventty/input/KeymapFile.h
+    ventty/input/KeymapFile.cpp
+
     # umbrella
     ventty/ventty.h
 )
